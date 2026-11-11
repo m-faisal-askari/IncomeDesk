@@ -1,0 +1,152 @@
+import React from 'react';
+import { NavLink } from 'react-router-dom';
+import { useAuth } from '../contexts/AuthContext';
+import { BrandIcon } from './BrandAssets';
+import {
+  LayoutDashboard,
+  ArrowLeftRight,
+  TrendingUp,
+  TrendingDown,
+  Wallet,
+  PieChart,
+  Users,
+  Briefcase,
+  FileText,
+  Repeat,
+  ShieldAlert,
+  Target,
+  BarChart3,
+  Settings,
+  ShieldCheck,
+  DollarSign
+} from 'lucide-react';
+
+const navigationGroups = [
+  {
+    title: 'Overview',
+    items: [
+      { name: 'Dashboard', path: '/', icon: LayoutDashboard },
+    ]
+  },
+  {
+    title: 'Financial Management',
+    items: [
+      { name: 'Transactions', path: '/transactions', icon: ArrowLeftRight },
+      { name: 'Income', path: '/income', icon: TrendingUp },
+      { name: 'Expenses', path: '/expenses', icon: TrendingDown },
+      { name: 'Accounts', path: '/accounts', icon: Wallet },
+      { name: 'Budgets', path: '/budgets', icon: PieChart },
+      { name: 'Loans & Debt', path: '/loans', icon: DollarSign },
+    ]
+  },
+  {
+    title: 'Freelance Operations',
+    items: [
+      { name: 'Clients', path: '/clients', icon: Users },
+      { name: 'Projects', path: '/projects', icon: Briefcase },
+      { name: 'Invoices', path: '/invoices', icon: FileText },
+      { name: 'Subscriptions', path: '/subscriptions', icon: Repeat },
+    ]
+  },
+  {
+    title: 'Financial Planning',
+    items: [
+      { name: 'Tax Reserve', path: '/taxes', icon: ShieldAlert },
+      { name: 'Savings Goals', path: '/savings', icon: Target },
+      { name: 'Reports & Analytics', path: '/reports', icon: BarChart3 },
+    ]
+  },
+  {
+    title: 'Account',
+    items: [
+      { name: 'Settings & Profile', path: '/settings', icon: Settings },
+      { name: 'Pricing', path: '/pricing', icon: DollarSign },
+      { name: 'Privacy & Terms', path: '/privacy', icon: ShieldCheck },
+    ]
+  }
+];
+
+export function Sidebar({ isOpen, onClose }) {
+  const { user } = useAuth();
+  const displayName = user?.full_name || 'Independent Freelancer';
+  const initials = displayName
+    .split(' ')
+    .filter(Boolean)
+    .map(n => n.charAt(0))
+    .join('')
+    .slice(0, 2)
+    .toUpperCase() || 'FL';
+  return (
+    <>
+      {/* Mobile backdrop */}
+      {isOpen && (
+        <div 
+          className="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-40 lg:hidden"
+          onClick={onClose}
+        />
+      )}
+
+      <aside className={`
+        app-sidebar fixed top-0 bottom-0 left-0 z-40 w-64 flex flex-col transition-transform duration-200 ease-in-out border-r
+        ${isOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
+      `}>
+        {/* App Brand Header */}
+        <div className="sidebar-header h-16 flex items-center px-6 gap-3 border-b">
+          <div className="flex h-9 w-9 shrink-0 items-center justify-center">
+            <BrandIcon className="h-9 w-9 object-contain" />
+          </div>
+          <div>
+            <h1 className="sidebar-title font-bold text-base tracking-tight leading-none">IncomeDesk</h1>
+            <span className="sidebar-caption text-[10px] font-medium uppercase tracking-wider">Financial Workspace · Beta</span>
+          </div>
+        </div>
+
+        {/* Navigation list */}
+        <div className="flex-1 overflow-y-auto px-3 py-4 space-y-6">
+          {navigationGroups.map((group) => (
+            <div key={group.title}>
+              <h4 className="sidebar-section-title px-3 text-[11px] font-semibold uppercase tracking-wider mb-1.5">
+                {group.title}
+              </h4>
+              <div className="space-y-0.5">
+                {group.items.map((item) => {
+                  const Icon = item.icon;
+                  return (
+                    <NavLink
+                      key={item.path}
+                      to={item.path}
+                      onClick={onClose}
+                      className={({ isActive }) => `sidebar-link flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${isActive ? 'is-active' : ''}`}
+                    >
+                      <Icon className="w-4 h-4 shrink-0" />
+                      <span>{item.name}</span>
+                    </NavLink>
+                  );
+                })}
+              </div>
+            </div>
+          ))}
+        </div>
+
+        {/* User indicator footer */}
+        <div className="sidebar-footer p-4 border-t">
+          <div className="flex items-center gap-3">
+            <div className="sidebar-avatar w-8 h-8 rounded-full flex items-center justify-center font-semibold text-xs">
+              {user?.avatar_url ? (
+                <img src={user.avatar_url} alt="" className="w-full h-full rounded-full object-cover" />
+              ) : (
+                initials
+              )}
+            </div>
+            <div className="overflow-hidden">
+              <p className="sidebar-user-name text-xs font-medium truncate">{displayName}</p>
+              <p className="text-[10px] text-[var(--analytics-text)] font-mono">
+                {user?.is_guest ? '○ Guest Mode' : '● Production Engine'}
+              </p>
+            </div>
+          </div>
+        </div>
+      </aside>
+    </>
+  );
+}
