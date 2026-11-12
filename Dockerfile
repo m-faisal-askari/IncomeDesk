@@ -1,16 +1,6 @@
 # syntax=docker/dockerfile:1
 
-# Stage 1: Build Frontend SPA
-FROM node:20-slim AS frontend-builder
-WORKDIR /app/frontend
-
-COPY frontend/package*.json ./
-RUN npm ci || npm install
-
-COPY frontend/ ./
-RUN npm run build
-
-# Stage 2: Production Python Backend
+# Production Python API
 FROM python:3.12-slim
 WORKDIR /app
 
@@ -33,11 +23,8 @@ RUN pip install --no-cache-dir -r backend/requirements.txt
 COPY backend/ ./backend/
 COPY alembic.ini ./
 
-# Copy compiled frontend from frontend-builder
-COPY --from=frontend-builder /app/frontend/dist ./frontend/dist
-
 # Expose HTTP port
 EXPOSE 8080
 
-# Run migrations and start uvicorn
-CMD ["sh", "-c", "alembic upgrade head && uvicorn backend.app.main:app --host 0.0.0.0 --port ${PORT:-8080}"]
+# Fly.io runs migrations once per release through fly.toml's release_command.
+CMD ["sh", "-c", "exec uvicorn backend.app.main:app --host 0.0.0.0 --port ${PORT:-8080}"]

@@ -7,9 +7,13 @@ app = 'patient-fern-1718'
 primary_region = 'sin'
 
 [env]
-  FRONTEND_URL = 'https://expense-tracker-v1-xi.vercel.app'
+  FRONTEND_URL = 'https://incomedesk.vercel.app'
 
 [build]
+
+[deploy]
+  release_command = 'alembic upgrade head'
+
 [http_service]
   internal_port = 8080
   force_https = true

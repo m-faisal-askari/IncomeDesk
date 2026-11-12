@@ -170,15 +170,23 @@ npm run build
    - Keep `DEV_AUTH_ENABLED=False` in production. Email/password and Google sign-in both use this same Supabase Auth project; there is no separate backend password account path.
    - The latest migration clears legacy backend SHA-256 password hashes. Signing in to Supabase with the same email links to the existing local account ID and its financial records.
    - Run `alembic upgrade head` to apply all migrations to Supabase.
-2. **Backend Hosting (Render / Railway / Fly.io)**:
+2. **Backend Hosting (Render / Railway)**:
    - Build Command: `pip install -r backend/requirements.txt && alembic upgrade head`
    - Start Command: `uvicorn backend.app.main:app --host 0.0.0.0 --port $PORT`
    - Environment variable: `FRONTEND_URL=https://your-frontend-domain.com`
-3. **Frontend Hosting (Vercel / Cloudflare Pages)**:
+3. **Backend Hosting (Fly.io)**:
+   - From the repository root, authenticate with `fly auth login` and deploy with `fly deploy`.
+   - `fly.toml` targets the existing `patient-fern-1718` API in Singapore, builds the backend-only root `Dockerfile`, serves port `8080`, and checks `/health`.
+   - The Fly app exposes the API and docs only. The React frontend is hosted separately on Vercel.
+   - `FRONTEND_URL` is set to `https://incomedesk.vercel.app` for CORS.
+   - Set `DATABASE_URL` to the production PostgreSQL connection string and configure `SUPABASE_URL`, `SUPABASE_ANON_KEY`, and `DEV_AUTH_ENABLED=False` as Fly secrets. Configure `SUPABASE_JWT_SECRET` only for Supabase projects that still use HS256 signing.
+   - The Fly release command applies Alembic migrations once before the new Machines receive traffic. Keep production credentials in Fly secrets; do not commit them to this repository.
+4. **Frontend Hosting (Vercel / Cloudflare Pages)**:
    - Root directory: `frontend`
    - Build Command: `npm run build`
    - Output directory: `dist`
    - Environment variables: `VITE_API_URL=https://your-backend-domain.com` and `VITE_SITE_URL=https://your-frontend-domain.com`
+   - For this deployment, set `VITE_API_URL=https://patient-fern-1718.fly.dev` and `VITE_SITE_URL=https://incomedesk.vercel.app` in Vercel project settings.
    - Copy `frontend/.env.example` to `frontend/.env` and set the URLs for local configuration. Configure the matching `FRONTEND_URL` in the backend environment for CORS.
 
 ---

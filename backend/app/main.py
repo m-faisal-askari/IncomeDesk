@@ -1,7 +1,6 @@
 import os
-from fastapi import FastAPI, HTTPException, Request
-from fastapi.staticfiles import StaticFiles
-from fastapi.responses import FileResponse, Response
+from fastapi import FastAPI, Request
+from fastapi.responses import Response
 from fastapi.middleware.cors import CORSMiddleware
 from backend.app.core.config import settings
 from backend.app.core.database import engine, Base
@@ -65,25 +64,15 @@ def health_check(request: Request):
         return Response(status_code=200)
     return {"status": "ok", "app": settings.PROJECT_NAME, "version": "1.0.0"}
 
-@app.api_route("/", methods=["HEAD"])
-def root_head_check():
-    return Response(status_code=200)
-
-# Serve frontend static assets and SPA fallback
-frontend_dist = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "frontend", "dist"))
-if os.path.exists(frontend_dist):
-    assets_dir = os.path.join(frontend_dist, "assets")
-    if os.path.exists(assets_dir):
-        app.mount("/assets", StaticFiles(directory=assets_dir), name="assets")
-
-    @app.get("/{full_path:path}")
-    async def serve_spa(full_path: str):
-        if full_path.startswith("api") or full_path == "health":
-            raise HTTPException(status_code=404, detail="Not Found")
-        file_path = os.path.join(frontend_dist, full_path)
-        if full_path and os.path.isfile(file_path):
-            return FileResponse(file_path)
-        return FileResponse(os.path.join(frontend_dist, "index.html"))
+@app.api_route("/", methods=["GET", "HEAD"])
+def root(request: Request):
+    if request.method == "HEAD":
+        return Response(status_code=200)
+    return {
+        "status": "ok",
+        "app": settings.PROJECT_NAME,
+        "docs": f"{settings.API_V1_STR}/docs",
+    }
 
 if __name__ == "__main__":
     import uvicorn
