@@ -37,11 +37,12 @@ export function ToastProvider({ children }) {
   }, [showToast]);
 
   useEffect(() => {
-    const handleAuthError = () => {
+    const handleAuthError = (event) => {
+      const { title, message } = event?.detail || {};
       showToast({
         type: 'error',
-        title: 'Sign-in required',
-        message: 'Your session expired or could not be verified. Please sign in again to continue.',
+        title: title || 'Sign-in required',
+        message: message || 'Your sign-in session could not be verified. Please sign in again.',
         duration: 9000
       });
     };

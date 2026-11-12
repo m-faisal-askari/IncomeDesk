@@ -1,9 +1,9 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { api } from '../api/client';
 import { supabase } from '../api/supabase';
-import { FRONTEND_URL, getFrontendUrl } from '../config/urls';
+import { getFrontendUrl } from '../config/urls';
 import { useQueryClient } from '@tanstack/react-query';
-import { clearAuthError } from '../utils/authErrorEvents';
+import { clearAuthError, reportAuthError } from '../utils/authErrorEvents';
 
 const AuthContext = createContext(null);
 
@@ -43,21 +43,24 @@ export function AuthProvider({ children }) {
     try {
       const data = await api.get('/auth/me');
       if (!data?.is_authenticated || data.is_guest) {
-        const authError = new Error('The server did not accept this sign-in session.');
+        const authError = new Error('The API returned a session without an authenticated user profile. Please sign in again.');
         authError.status = 401;
         throw authError;
       }
       setUser(data);
       return data;
     } catch (error) {
-      if (error.status === 401) setUser(null);
+      if (error.status === 401) {
+        setUser(null);
+        reportAuthError(error.message, 'Sign-in could not be verified');
+      }
       throw error;
     } finally {
       setLoading(false);
     }
   };
 
-  const syncOAuthProfile = async (sessionUser) => {
+  const syncUserProfile = async (sessionUser) => {
     if (!sessionUser) return;
     const fullName = sessionUser.user_metadata?.full_name ||
       sessionUser.user_metadata?.name ||
@@ -67,48 +70,73 @@ export function AuthProvider({ children }) {
     await api.put('/auth/profile', { full_name: fullName });
   };
 
-  const hydrateAuthenticatedUser = async (sessionUser) => {
+  const hydrateAuthenticatedUser = async (sessionUser, isActive = () => true) => {
     if (!sessionUser) return null;
+    if (!isActive()) return null;
 
     // Keep the authenticated shell available if the API is briefly unavailable.
     setUser(getSessionUserFallback(sessionUser));
 
     try {
-      await syncOAuthProfile(sessionUser);
+      await syncUserProfile(sessionUser);
     } catch (error) {
       if (error.status === 401) throw error;
+      if (!isActive()) return null;
+      reportAuthError(
+        error.message || 'Google sign-in worked, but IncomeDesk could not sync your account profile.',
+        'Account setup needs attention'
+      );
     }
 
     try {
+      if (!isActive()) return null;
       return await fetchCurrentUser();
     } catch (error) {
       if (error.status === 401) throw error;
+      if (isActive()) {
+        reportAuthError(
+          error.message || 'Your sign-in worked, but IncomeDesk could not load your account yet.',
+          'Account setup needs attention'
+        );
+      }
       return null;
     }
   };
 
   useEffect(() => {
+    let isActive = true;
+
     const initAuth = async () => {
       try {
         const { data, error } = await supabase.auth.getSession();
         if (error) throw error;
+        if (!isActive) return;
         if (data?.session?.user) {
-          await hydrateAuthenticatedUser(data.session.user);
+          await hydrateAuthenticatedUser(data.session.user, () => isActive);
         } else {
           setUser(null);
         }
       } catch (error) {
+        if (!isActive) return;
         if (error.status === 401) {
           setUser(null);
+          reportAuthError(
+            error.message || 'Your saved sign-in session is invalid or expired. Please sign in again.',
+            'Sign-in could not be restored'
+          );
           await supabase.auth.signOut({ scope: 'local' }).catch(() => {});
+        } else {
+          reportAuthError(
+            error.message || 'IncomeDesk could not restore your saved sign-in session. Please try signing in again.',
+            'Could not restore sign-in'
+          );
         }
       } finally {
-        setLoading(false);
+        if (isActive) setLoading(false);
       }
     };
 
-    initAuth();
-
+    // Listen before reading the session so an OAuth callback event cannot be missed.
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
       if (event === 'SIGNED_IN' || event === 'PASSWORD_RECOVERY') {
         clearAuthError();
@@ -122,7 +150,12 @@ export function AuthProvider({ children }) {
       }
     });
 
-    return () => subscription?.unsubscribe();
+    void initAuth();
+
+    return () => {
+      isActive = false;
+      subscription?.unsubscribe();
+    };
   }, []);
 
   const login = async (email, password) => {

@@ -8,39 +8,94 @@ if (!SUPABASE_URL || !SUPABASE_ANON_KEY) {
 }
 
 const AUTH_STORAGE_KEY = `sb-${new URL(SUPABASE_URL).hostname.split('.')[0]}-auth-token`;
-let authStorage;
-let persistentStorageAvailable = false;
 
-if (typeof window !== 'undefined') {
-  try {
-    authStorage = window.localStorage;
-    persistentStorageAvailable = true;
-  } catch {
+/**
+ * Prefer durable browser storage, but tolerate browsers that block it. The
+ * sessionStorage path also migrates sessions written by older app versions.
+ */
+function createAuthStorage() {
+  const memoryStorage = new Map();
+
+  const getBrowserStorage = (name) => {
     try {
-      authStorage = window.sessionStorage;
+      return typeof window === 'undefined' ? null : window[name];
     } catch {
-      authStorage = undefined;
+      return null;
     }
-  }
+  };
 
-  if (persistentStorageAvailable) {
-    try {
-      const existingSession = window.sessionStorage.getItem(AUTH_STORAGE_KEY);
-      if (existingSession && !authStorage.getItem(AUTH_STORAGE_KEY)) {
-        authStorage.setItem(AUTH_STORAGE_KEY, existingSession);
+  return {
+    getItem(key) {
+      const localStorage = getBrowserStorage('localStorage');
+      if (localStorage) {
+        try {
+          const value = localStorage.getItem(key);
+          if (value !== null) return value;
+        } catch {
+          // Try the less durable browser store below.
+        }
       }
-    } catch {
-      // A blocked legacy session should not prevent using persistent storage.
-    }
-  }
+
+      const sessionStorage = getBrowserStorage('sessionStorage');
+      if (sessionStorage) {
+        try {
+          const value = sessionStorage.getItem(key);
+          if (value !== null) {
+            // Move an older tab-only session to durable storage when possible.
+            if (localStorage) {
+              try {
+                localStorage.setItem(key, value);
+                sessionStorage.removeItem(key);
+              } catch {
+                // Keep using the sessionStorage copy if localStorage is blocked.
+              }
+            }
+            return value;
+          }
+        } catch {
+          // Fall through to the in-memory copy.
+        }
+      }
+
+      return memoryStorage.get(key) ?? null;
+    },
+
+    setItem(key, value) {
+      for (const storageName of ['localStorage', 'sessionStorage']) {
+        const storage = getBrowserStorage(storageName);
+        if (!storage) continue;
+        try {
+          storage.setItem(key, value);
+          return;
+        } catch {
+          // Try the next storage option.
+        }
+      }
+      memoryStorage.set(key, value);
+    },
+
+    removeItem(key) {
+      for (const storageName of ['localStorage', 'sessionStorage']) {
+        const storage = getBrowserStorage(storageName);
+        try {
+          storage?.removeItem(key);
+        } catch {
+          // A blocked browser store must not prevent clearing other stores.
+        }
+      }
+      memoryStorage.delete(key);
+    },
+  };
 }
 
 export const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
   auth: {
     storageKey: AUTH_STORAGE_KEY,
+    storage: createAuthStorage(),
     persistSession: true,
     autoRefreshToken: true,
     detectSessionInUrl: true,
-    storage: authStorage,
+    // OAuth uses a one-time code and the verifier stored before redirect.
+    flowType: 'pkce',
   }
 });

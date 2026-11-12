@@ -72,13 +72,25 @@ async function fetchWithAuth(url, options = {}, { jsonBody = false } = {}) {
         // Keep the last API response for the normal unauthorized handling below.
       }
     }
+  }
 
-    if (response.status === 401) {
-      reportAuthError();
-      // The recovered token was also rejected (or refresh failed), so clear
-      // the unusable local session and return to the signed-out app state.
-      supabase.auth.signOut({ scope: 'local' }).catch(() => {});
-    }
+  if (response.status === 401) {
+    const message = await getResponseErrorMessage(
+      response,
+      token
+        ? 'The API rejected your sign-in token. Please sign in again.'
+        : 'No access token was sent to the API. Please sign in again.'
+    );
+    reportAuthError(message, 'Sign-in could not be verified');
+    // A 401 after refresh means the backend explicitly rejected the token.
+    // Temporary verifier failures now use 503 and leave the session intact.
+    supabase.auth.signOut({ scope: 'local' }).catch(() => {});
+  } else if (response.status === 503) {
+    const message = await getResponseErrorMessage(
+      response,
+      'The authentication service is temporarily unavailable. Your session was kept; please retry shortly.'
+    );
+    reportAuthError(message, 'Sign-in check unavailable');
   }
 
   return response;
@@ -148,6 +160,15 @@ function extractErrorMessage(errorData, fallbackText = 'An unexpected error occu
   
   if (errorData.message) return errorData.message;
   return fallbackText;
+}
+
+async function getResponseErrorMessage(response, fallbackText) {
+  try {
+    const errorData = await response.clone().json();
+    return extractErrorMessage(errorData, fallbackText);
+  } catch {
+    return fallbackText;
+  }
 }
 
 export async function fetchApi(endpoint, options = {}) {

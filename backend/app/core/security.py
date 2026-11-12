@@ -1,10 +1,20 @@
 from functools import lru_cache
+import logging
 from typing import Optional
 from uuid import UUID
 
 import jwt
 from fastapi import Depends, HTTPException, status
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
+from jwt.exceptions import (
+    ExpiredSignatureError,
+    InvalidAudienceError,
+    InvalidIssuerError,
+    InvalidSignatureError,
+    InvalidTokenError,
+    PyJWKClientConnectionError,
+    PyJWKClientError,
+)
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
@@ -13,6 +23,7 @@ from backend.app.core.database import get_db
 
 security = HTTPBearer(auto_error=False)
 _ASYMMETRIC_ALGORITHMS = {"ES256", "RS256", "EdDSA"}
+logger = logging.getLogger(__name__)
 
 
 @lru_cache(maxsize=4)
@@ -20,10 +31,14 @@ def _jwk_client(jwks_url: str) -> jwt.PyJWKClient:
     return jwt.PyJWKClient(jwks_url, cache_jwk_set=True, lifespan=300, timeout=5)
 
 
-def verify_token(token: str) -> Optional[dict]:
+def verify_token(token: str) -> dict:
     """Verify a Supabase user access token; never trust decoded unsigned claims."""
     if not token:
-        return None
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="No access token was sent. Please sign in again.",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
 
     if settings.DEV_AUTH_ENABLED and (
         token.startswith("dev-user-") or token.startswith("auth-tester-")
@@ -31,7 +46,10 @@ def verify_token(token: str) -> Optional[dict]:
         prefix = "dev-user-" if token.startswith("dev-user-") else "auth-tester-"
         user_id = token[len(prefix):]
         if not user_id:
-            return None
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="The development sign-in token is incomplete. Please sign in again.",
+            )
         user_name = user_id.replace("-", " ").replace("_", " ").title()
         return {
             "sub": user_id,
@@ -44,7 +62,11 @@ def verify_token(token: str) -> Optional[dict]:
 
     supabase_url = (settings.SUPABASE_URL or "").rstrip("/")
     if not supabase_url:
-        return None
+        logger.error("Supabase token verification is unavailable: SUPABASE_URL is not configured")
+        raise HTTPException(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            detail="IncomeDesk authentication is not configured on the server. Contact the app administrator.",
+        )
     issuer = f"{supabase_url}/auth/v1"
 
     try:
@@ -55,7 +77,11 @@ def verify_token(token: str) -> Optional[dict]:
             # For legacy Supabase projects, require the explicitly configured secret.
             # No built-in development key is accepted.
             if not settings.SUPABASE_JWT_SECRET:
-                return None
+                logger.error("Supabase uses HS256 but SUPABASE_JWT_SECRET is not configured")
+                raise HTTPException(
+                    status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+                    detail="The server is missing the Supabase JWT secret required to verify this sign-in. Contact the app administrator.",
+                )
             payload = jwt.decode(
                 token,
                 settings.SUPABASE_JWT_SECRET,
@@ -74,14 +100,80 @@ def verify_token(token: str) -> Optional[dict]:
                 audience="authenticated",
             )
         else:
-            return None
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="The sign-in token uses an unsupported signing algorithm. Sign in again and contact the app administrator if this continues.",
+            )
+    except HTTPException:
+        raise
+    except ExpiredSignatureError:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Your Supabase sign-in session has expired. Please sign in again.",
+            headers={"WWW-Authenticate": 'Bearer error="invalid_token"'},
+        )
+    except InvalidIssuerError:
+        logger.warning("Rejected Supabase access token with a different issuer")
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="This sign-in token belongs to a different Supabase project. Check that the frontend and backend use the same project URL.",
+            headers={"WWW-Authenticate": 'Bearer error="invalid_token"'},
+        )
+    except InvalidAudienceError:
+        logger.warning("Rejected Supabase access token with an unexpected audience")
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Supabase returned a token with an unexpected audience. Check the backend Supabase project and auth configuration.",
+            headers={"WWW-Authenticate": 'Bearer error="invalid_token"'},
+        )
+    except InvalidSignatureError:
+        logger.warning("Rejected Supabase access token with an invalid signature")
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="The sign-in token signature is invalid. Check that the frontend and backend use the same Supabase project and signing settings.",
+            headers={"WWW-Authenticate": 'Bearer error="invalid_token"'},
+        )
+    except PyJWKClientConnectionError:
+        logger.exception("Could not reach Supabase JWKS endpoint %s", f"{issuer}/.well-known/jwks.json")
+        raise HTTPException(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            detail="IncomeDesk could not reach Supabase to verify your sign-in. Your session was kept; please retry in a moment.",
+        )
+    except PyJWKClientError:
+        logger.warning("Supabase signing key was not found for the presented token")
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Supabase's signing key did not match this token. Sign in again; if this continues, check that both app environments use the same Supabase project.",
+            headers={"WWW-Authenticate": 'Bearer error="invalid_token"'},
+        )
+    except InvalidTokenError as exc:
+        logger.info("Rejected malformed Supabase access token: %s", type(exc).__name__)
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="The Supabase access token is malformed or could not be verified. Please sign in again.",
+            headers={"WWW-Authenticate": 'Bearer error="invalid_token"'},
+        )
     except Exception:
-        return None
+        # A verifier bug or unexpected upstream failure is a server problem, not
+        # proof that the user's browser session has expired.
+        logger.exception("Unexpected error while verifying a Supabase access token")
+        raise HTTPException(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            detail="IncomeDesk could not verify your sign-in right now. Your session was kept; please retry in a moment.",
+        )
 
     if payload.get("role") != "authenticated" or payload.get("is_anonymous"):
-        return None
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="This Supabase session is not an authenticated user session. Please sign in again.",
+            headers={"WWW-Authenticate": 'Bearer error="invalid_token"'},
+        )
     if not payload.get("sub") or not payload.get("email"):
-        return None
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="The Supabase session is missing its user ID or email. Check Google email/profile access and sign in again.",
+            headers={"WWW-Authenticate": 'Bearer error="invalid_token"'},
+        )
     return payload
 
 
@@ -93,11 +185,19 @@ def _resolve_user(payload: dict, db: Session) -> dict:
     try:
         UUID(subject)
     except (ValueError, TypeError, AttributeError):
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid access token.")
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Supabase returned an invalid user ID in this session. Please sign in again.",
+            headers={"WWW-Authenticate": 'Bearer error="invalid_token"'},
+        )
 
     email = str(payload["email"]).strip().lower()
     if "@" not in email:
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid access token.")
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Supabase did not provide a valid email for this account. Allow Google email access and sign in again.",
+            headers={"WWW-Authenticate": 'Bearer error="invalid_token"'},
+        )
 
     account = db.query(UserAccount).filter(UserAccount.provider_id == subject).first()
     if account is None:
@@ -168,17 +268,11 @@ def get_current_user_claims(
     if not credentials or not credentials.credentials:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Authentication required.",
+            detail="No access token was sent to the API. Please sign in again.",
             headers={"WWW-Authenticate": "Bearer"},
         )
 
     payload = verify_token(credentials.credentials)
-    if not payload:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Invalid or expired access token.",
-            headers={"WWW-Authenticate": "Bearer"},
-        )
 
     if payload.get("_dev_auth"):
         user_id = str(payload["sub"])
