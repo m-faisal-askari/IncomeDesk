@@ -13,12 +13,14 @@ router = APIRouter(prefix="/auth", tags=["Authentication & Profile"])
 DEFAULT_EXPENSE_CATEGORIES = [
     ("Software & Subscriptions", "#6366f1", "Laptop", True),
     ("Hardware & Equipment", "#3b82f6", "Cpu", True),
+    ("Gear & Equipment Rental", "#0284c7", "Camera", True),
+    ("Production, Props & Studio", "#84cc16", "Film", True),
     ("Internet & Utilities", "#06b6d4", "Wifi", True),
     ("Office Supplies & Workspace", "#10b981", "Home", True),
     ("Marketing & Advertising", "#f59e0b", "Megaphone", True),
     ("Travel & Transportation", "#ec4899", "Plane", True),
     ("Education & Training", "#8b5cf6", "BookOpen", True),
-    ("Freelance Contractors", "#14b8a6", "Users", True),
+    ("Freelance Contractors & Crew", "#14b8a6", "Users", True),
     ("Professional & Legal Services", "#64748b", "FileText", True),
     ("Bank & Transaction Fees", "#ef4444", "CreditCard", True),
     ("Meals & Entertainment", "#f97316", "Coffee", False),
@@ -36,30 +38,33 @@ DEFAULT_INCOME_CATEGORIES = [
 ]
 
 def seed_default_categories(db: Session, user_id: str):
-    existing = db.query(Category).filter(Category.user_id == user_id).first()
-    if existing:
-        return
-    
+    existing_cats = {c.name.lower() for c in db.query(Category).filter(Category.user_id == user_id).all()}
+
     for name, color, icon, deductible in DEFAULT_EXPENSE_CATEGORIES:
-        db.add(Category(
-            user_id=user_id,
-            name=name,
-            type="EXPENSE",
-            is_tax_deductible=deductible,
-            color=color,
-            icon=icon,
-            is_system=True
-        ))
+        if name.lower() not in existing_cats:
+            db.add(Category(
+                user_id=user_id,
+                name=name,
+                type="EXPENSE",
+                is_tax_deductible=deductible,
+                color=color,
+                icon=icon,
+                is_system=True
+            ))
+            existing_cats.add(name.lower())
+
     for name, color, icon in DEFAULT_INCOME_CATEGORIES:
-        db.add(Category(
-            user_id=user_id,
-            name=name,
-            type="INCOME",
-            is_tax_deductible=False,
-            color=color,
-            icon=icon,
-            is_system=True
-        ))
+        if name.lower() not in existing_cats:
+            db.add(Category(
+                user_id=user_id,
+                name=name,
+                type="INCOME",
+                is_tax_deductible=False,
+                color=color,
+                icon=icon,
+                is_system=True
+            ))
+            existing_cats.add(name.lower())
     db.commit()
 
 @router.get("/me")

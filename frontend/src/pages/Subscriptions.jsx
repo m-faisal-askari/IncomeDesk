@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { Plus, Repeat, Calendar, Check, Edit3, Trash2, DollarSign } from 'lucide-react';
+import { Plus, Repeat, Calendar, Check, Edit3, Trash2, DollarSign, Sparkles, ChevronDown, CheckCircle2 } from 'lucide-react';
 import { api } from '../api/client';
 import { Modal } from '../components/Modal';
 import { MetricCard } from '../components/MetricCard';
@@ -10,6 +10,33 @@ import { formatCurrency, formatDate } from '../utils/formatters';
 import { useToast } from '../contexts/ToastContext';
 import { useCurrency } from '../contexts/CurrencyContext';
 
+const POPULAR_SUBSCRIPTION_PRESETS = [
+  {
+    category: 'Film, Video & Creative Suite',
+    items: [
+      { name: 'Adobe Creative Cloud', vendor: 'Adobe', amount: '54.99', currency: 'USD', billing_frequency: 'MONTHLY', notes: 'Premiere Pro, After Effects, Photoshop, Audition' },
+      { name: 'Frame.io Video Review', vendor: 'Adobe / Frame.io', amount: '15.00', currency: 'USD', billing_frequency: 'MONTHLY', notes: 'Client review and cloud dailies collaboration' },
+      { name: 'Artlist / Musicbed Music Licensing', vendor: 'Artlist', amount: '29.99', currency: 'USD', billing_frequency: 'MONTHLY', notes: 'Commercial royalty-free music and sound effects' },
+      { name: 'DaVinci Resolve Studio', vendor: 'Blackmagic Design', amount: '295.00', currency: 'USD', billing_frequency: 'ANNUALLY', notes: 'Color grading, editing, and Fairlight audio post' },
+      { name: 'Envato Elements', vendor: 'Envato', amount: '16.50', currency: 'USD', billing_frequency: 'MONTHLY', notes: 'Video motion templates, graphic elements, stock footage' },
+      { name: 'Vimeo Pro Video Showcase', vendor: 'Vimeo', amount: '20.00', currency: 'USD', billing_frequency: 'MONTHLY', notes: 'Ad-free client portfolio presentation and review player' },
+      { name: 'Epidemic Sound', vendor: 'Epidemic Sound', amount: '15.00', currency: 'USD', billing_frequency: 'MONTHLY', notes: 'Direct music and SFX licensing for social & brand campaigns' },
+    ]
+  },
+  {
+    category: 'Freelance Tech & Productivity',
+    items: [
+      { name: 'Google Workspace', vendor: 'Google', amount: '12.00', currency: 'USD', billing_frequency: 'MONTHLY', notes: 'Custom business domain email, Drive storage, Meet' },
+      { name: 'Figma Professional', vendor: 'Figma', amount: '15.00', currency: 'USD', billing_frequency: 'MONTHLY', notes: 'UI/UX design, interactive prototyping, moodboards' },
+      { name: 'ChatGPT Plus / Claude Pro', vendor: 'OpenAI / Anthropic', amount: '20.00', currency: 'USD', billing_frequency: 'MONTHLY', notes: 'AI assistance for treatments, scripting, and client proposals' },
+      { name: 'Notion Plus', vendor: 'Notion', amount: '10.00', currency: 'USD', billing_frequency: 'MONTHLY', notes: 'Production wiki, call sheets, storyboard schedules' },
+      { name: 'GitHub Pro / Team', vendor: 'GitHub', amount: '4.00', currency: 'USD', billing_frequency: 'MONTHLY', notes: 'Code hosting, issue tracking, continuous deployment' },
+      { name: 'Dropbox Pro (2TB)', vendor: 'Dropbox', amount: '11.99', currency: 'USD', billing_frequency: 'MONTHLY', notes: 'High-speed raw media transfer and project archiving' },
+      { name: 'Zoom Workplace', vendor: 'Zoom', amount: '15.99', currency: 'USD', billing_frequency: 'MONTHLY', notes: 'Client video calls, pre-production meetings' }
+    ]
+  }
+];
+
 export function Subscriptions() {
   const queryClient = useQueryClient();
   const { showSuccess, showError } = useToast();
@@ -17,6 +44,7 @@ export function Subscriptions() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [selectedSub, setSelectedSub] = useState(null);
+  const [showPresetsDropdown, setShowPresetsDropdown] = useState(false);
 
   const [form, setForm] = useState({
     name: '',
@@ -137,24 +165,85 @@ export function Subscriptions() {
     setIsEditModalOpen(true);
   };
 
+  const applySubscriptionPreset = (preset) => {
+    setForm({
+      name: preset.name,
+      vendor: preset.vendor,
+      amount: preset.amount,
+      currency: preset.currency || defaultCurrency || 'USD',
+      billing_frequency: preset.billing_frequency,
+      next_payment_date: new Date().toISOString().split('T')[0],
+      account_id: accounts?.[0]?.id || '',
+      notes: preset.notes
+    });
+    setShowPresetsDropdown(false);
+    setIsModalOpen(true);
+    showSuccess(`Selected: ${preset.name}`);
+  };
+
   return (
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <h2 className="text-xl sm:text-2xl font-bold text-slate-900 tracking-tight">Recurring Subscriptions</h2>
-          <p className="text-xs sm:text-sm text-slate-500">Track recurring software tools, hosting, and professional services</p>
+          <p className="text-xs sm:text-sm text-slate-500">Track recurring software tools, creative suites, hosting, and memberships</p>
         </div>
 
-        <button
-          onClick={() => {
-            setForm({ name: '', vendor: '', amount: '', currency: defaultCurrency || 'USD', billing_frequency: 'MONTHLY', next_payment_date: new Date().toISOString().split('T')[0], account_id: '', notes: '' });
-            setIsModalOpen(true);
-          }}
-          className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-lg bg-indigo-600 text-white text-xs font-semibold hover:bg-indigo-700 shadow-sm transition"
-        >
-          <Plus className="w-3.5 h-3.5" />
-          Add Subscription
-        </button>
+        <div className="flex items-center gap-2">
+          {/* Quick Presets Dropdown */}
+          <div className="relative">
+            <button
+              type="button"
+              onClick={() => setShowPresetsDropdown(!showPresetsDropdown)}
+              className="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg bg-slate-100 text-slate-700 hover:bg-slate-200 text-xs font-semibold shadow-xs transition"
+            >
+              <Sparkles className="w-3.5 h-3.5 text-amber-500" />
+              Popular Presets
+              <ChevronDown className="w-3.5 h-3.5" />
+            </button>
+
+            {showPresetsDropdown && (
+              <div className="absolute right-0 mt-1.5 w-80 bg-white rounded-xl shadow-xl border border-slate-200 p-2 z-50 text-xs max-h-80 overflow-y-auto">
+                <div className="text-[10px] font-bold uppercase text-slate-400 px-2 py-1">Popular Tools & Subscriptions</div>
+                {POPULAR_SUBSCRIPTION_PRESETS.map((group) => (
+                  <div key={group.category} className="mb-2">
+                    <div className="text-[10px] font-semibold text-indigo-600 bg-indigo-50/70 px-2 py-0.5 rounded mb-1">
+                      {group.category}
+                    </div>
+                    {group.items.map((preset, pIdx) => (
+                      <button
+                        key={pIdx}
+                        type="button"
+                        onClick={() => applySubscriptionPreset(preset)}
+                        className="w-full text-left px-2 py-1.5 rounded hover:bg-slate-50 flex items-center justify-between text-slate-700 transition"
+                      >
+                        <div className="pr-2 truncate">
+                          <div className="font-semibold text-slate-900 truncate">{preset.name}</div>
+                          <div className="text-[10px] text-slate-400 truncate">{preset.notes}</div>
+                        </div>
+                        <span className="font-mono text-slate-500 font-bold shrink-0">
+                          {formatCurrency(preset.amount, preset.currency)}
+                          <span className="text-[9px] text-slate-400 font-normal">/{preset.billing_frequency === 'ANNUALLY' ? 'yr' : 'mo'}</span>
+                        </span>
+                      </button>
+                    ))}
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+
+          <button
+            onClick={() => {
+              setForm({ name: '', vendor: '', amount: '', currency: defaultCurrency || 'USD', billing_frequency: 'MONTHLY', next_payment_date: new Date().toISOString().split('T')[0], account_id: '', notes: '' });
+              setIsModalOpen(true);
+            }}
+            className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-lg bg-indigo-600 text-white text-xs font-semibold hover:bg-indigo-700 shadow-sm transition"
+          >
+            <Plus className="w-3.5 h-3.5" />
+            Add Subscription
+          </button>
+        </div>
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -256,8 +345,46 @@ export function Subscriptions() {
       )}
 
       {/* Add Subscription Modal */}
-      <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} title="Track Recurring Subscription">
+      <Modal isOpen={isModalOpen} onClose={() => { setIsModalOpen(false); setShowPresetsDropdown(false); }} title="Track Recurring Subscription">
         <form onSubmit={handleCreate} className="space-y-4 text-xs">
+          {/* Quick Preset Selector Chips inside Modal */}
+          <div>
+            <label className="block text-[11px] font-semibold text-slate-500 mb-1.5 flex items-center gap-1">
+              <Sparkles className="w-3 h-3 text-amber-500" />
+              Quick Fill from Popular Tools:
+            </label>
+            <div className="flex flex-wrap gap-1.5">
+              {[
+                { name: 'Adobe CC', vendor: 'Adobe', amount: '54.99', currency: 'USD', billing_frequency: 'MONTHLY', notes: 'Premiere Pro & After Effects' },
+                { name: 'Frame.io', vendor: 'Adobe / Frame.io', amount: '15.00', currency: 'USD', billing_frequency: 'MONTHLY', notes: 'Video review' },
+                { name: 'Artlist', vendor: 'Artlist', amount: '29.99', currency: 'USD', billing_frequency: 'MONTHLY', notes: 'Royalty-free music' },
+                { name: 'DaVinci Studio', vendor: 'Blackmagic Design', amount: '295.00', currency: 'USD', billing_frequency: 'ANNUALLY', notes: 'Color grading' },
+                { name: 'Google Workspace', vendor: 'Google', amount: '12.00', currency: 'USD', billing_frequency: 'MONTHLY', notes: 'Domain email & Drive' },
+                { name: 'Figma', vendor: 'Figma', amount: '15.00', currency: 'USD', billing_frequency: 'MONTHLY', notes: 'Design sprint' },
+                { name: 'ChatGPT Plus', vendor: 'OpenAI', amount: '20.00', currency: 'USD', billing_frequency: 'MONTHLY', notes: 'AI assistant' }
+              ].map((p, idx) => (
+                <button
+                  key={idx}
+                  type="button"
+                  onClick={() => {
+                    setForm(prev => ({
+                      ...prev,
+                      name: p.name,
+                      vendor: p.vendor,
+                      amount: p.amount,
+                      currency: p.currency,
+                      billing_frequency: p.billing_frequency,
+                      notes: p.notes
+                    }));
+                  }}
+                  className="px-2 py-1 rounded-md bg-slate-100 hover:bg-indigo-50 hover:text-indigo-600 text-slate-700 text-[11px] font-medium transition"
+                >
+                  + {p.name}
+                </button>
+              ))}
+            </div>
+          </div>
+
           <div className="grid grid-cols-2 gap-3">
             <div>
               <label className="block text-xs font-medium text-slate-700 mb-1">Subscription Name</label>

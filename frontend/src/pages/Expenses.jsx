@@ -24,6 +24,8 @@ export function Expenses() {
     date: new Date().toISOString().split('T')[0],
     source_account_id: '',
     category_id: '',
+    project_id: '',
+    client_id: '',
     is_business: true,
     is_tax_deductible: true,
     notes: ''
@@ -37,6 +39,8 @@ export function Expenses() {
     date: new Date().toISOString().split('T')[0],
     source_account_id: '',
     category_id: '',
+    project_id: '',
+    client_id: '',
     is_business: true,
     is_tax_deductible: true,
     notes: ''
@@ -57,6 +61,16 @@ export function Expenses() {
     queryFn: () => api.get('/categories'),
   });
 
+  const { data: projects } = useQuery({
+    queryKey: ['projects'],
+    queryFn: () => api.get('/projects'),
+  });
+
+  const { data: clients } = useQuery({
+    queryKey: ['clients'],
+    queryFn: () => api.get('/clients'),
+  });
+
   const expenseCategories = categories?.filter(c => c.type === 'EXPENSE') || [];
 
   const createExpenseMutation = useMutation({
@@ -69,6 +83,7 @@ export function Expenses() {
       queryClient.invalidateQueries(['expenseTransactions']);
       queryClient.invalidateQueries(['transactions']);
       queryClient.invalidateQueries(['accounts']);
+      queryClient.invalidateQueries(['projects']);
       queryClient.invalidateQueries(['dashboardSummary']);
       setIsModalOpen(false);
       setForm({
@@ -78,6 +93,8 @@ export function Expenses() {
         date: new Date().toISOString().split('T')[0],
         source_account_id: accounts?.[0]?.id || '',
         category_id: '',
+        project_id: '',
+        client_id: '',
         is_business: true,
         is_tax_deductible: true,
         notes: ''
@@ -99,6 +116,7 @@ export function Expenses() {
       queryClient.invalidateQueries(['expenseTransactions']);
       queryClient.invalidateQueries(['transactions']);
       queryClient.invalidateQueries(['accounts']);
+      queryClient.invalidateQueries(['projects']);
       queryClient.invalidateQueries(['dashboardSummary']);
       setIsEditModalOpen(false);
       showSuccess(`Expense "${res.description}" updated.`);
@@ -114,6 +132,7 @@ export function Expenses() {
       queryClient.invalidateQueries(['expenseTransactions']);
       queryClient.invalidateQueries(['transactions']);
       queryClient.invalidateQueries(['accounts']);
+      queryClient.invalidateQueries(['projects']);
       queryClient.invalidateQueries(['dashboardSummary']);
       showSuccess('Expense record deleted.');
     },
@@ -131,6 +150,8 @@ export function Expenses() {
       date: tx.date ? tx.date.split('T')[0] : new Date().toISOString().split('T')[0],
       source_account_id: tx.source_account_id || '',
       category_id: tx.category_id || '',
+      project_id: tx.project_id || '',
+      client_id: tx.client_id || '',
       is_business: !!tx.is_business,
       is_tax_deductible: !!tx.is_tax_deductible,
       notes: tx.notes || ''
@@ -230,7 +251,15 @@ export function Expenses() {
                 {txs.map((tx) => (
                   <tr key={tx.id} className="hover:bg-slate-50/70 transition">
                     <td className="py-3 px-4 text-slate-600 whitespace-nowrap">{formatDate(tx.date)}</td>
-                    <td className="py-3 px-4 font-semibold text-slate-900">{tx.description}</td>
+                    <td className="py-3 px-4">
+                      <div className="font-semibold text-slate-900">{tx.description}</div>
+                      {tx.project_name && (
+                        <div className="inline-flex items-center gap-1 text-[10px] text-indigo-600 font-medium">
+                          <Briefcase className="w-2.5 h-2.5" />
+                          {tx.project_name}
+                        </div>
+                      )}
+                    </td>
                     <td className="py-3 px-4 text-slate-600 whitespace-nowrap">{tx.category_name || 'Expense'}</td>
                     <td className="py-3 px-4 text-slate-600 whitespace-nowrap">{tx.account_name || 'Account'}</td>
                     <td className="py-3 px-4 whitespace-nowrap">
@@ -379,6 +408,43 @@ export function Expenses() {
             </select>
           </div>
 
+          <div className="grid grid-cols-2 gap-3">
+            <div>
+              <label className="block text-xs font-medium text-slate-700 mb-1">Project (Optional)</label>
+              <select
+                value={form.project_id}
+                onChange={(e) => {
+                  const pid = e.target.value;
+                  const proj = projects?.find(p => p.id === pid);
+                  setForm(prev => ({
+                    ...prev,
+                    project_id: pid,
+                    client_id: proj?.client_id || prev.client_id
+                  }));
+                }}
+                className="w-full px-3 py-2 rounded-lg border border-slate-200"
+              >
+                <option value="">No Project (General Overhead)</option>
+                {projects?.map((p) => (
+                  <option key={p.id} value={p.id}>{p.name} {p.client_name ? `(${p.client_name})` : ''}</option>
+                ))}
+              </select>
+            </div>
+            <div>
+              <label className="block text-xs font-medium text-slate-700 mb-1">Client (Optional)</label>
+              <select
+                value={form.client_id}
+                onChange={(e) => setForm({ ...form, client_id: e.target.value })}
+                className="w-full px-3 py-2 rounded-lg border border-slate-200"
+              >
+                <option value="">No Client Linked</option>
+                {clients?.map((c) => (
+                  <option key={c.id} value={c.id}>{c.name}</option>
+                ))}
+              </select>
+            </div>
+          </div>
+
           <div className="flex flex-wrap items-center gap-x-6 gap-y-2 pt-2">
             <label className="flex items-center gap-2 cursor-pointer">
               <input
@@ -515,6 +581,43 @@ export function Expenses() {
                 <option key={c.id} value={c.id}>{c.name}</option>
               ))}
             </select>
+          </div>
+
+          <div className="grid grid-cols-2 gap-3">
+            <div>
+              <label className="block text-xs font-medium text-slate-700 mb-1">Project (Optional)</label>
+              <select
+                value={editForm.project_id}
+                onChange={(e) => {
+                  const pid = e.target.value;
+                  const proj = projects?.find(p => p.id === pid);
+                  setEditForm(prev => ({
+                    ...prev,
+                    project_id: pid,
+                    client_id: proj?.client_id || prev.client_id
+                  }));
+                }}
+                className="w-full px-3 py-2 rounded-lg border border-slate-200"
+              >
+                <option value="">No Project (General Overhead)</option>
+                {projects?.map((p) => (
+                  <option key={p.id} value={p.id}>{p.name} {p.client_name ? `(${p.client_name})` : ''}</option>
+                ))}
+              </select>
+            </div>
+            <div>
+              <label className="block text-xs font-medium text-slate-700 mb-1">Client (Optional)</label>
+              <select
+                value={editForm.client_id}
+                onChange={(e) => setEditForm({ ...editForm, client_id: e.target.value })}
+                className="w-full px-3 py-2 rounded-lg border border-slate-200"
+              >
+                <option value="">No Client Linked</option>
+                {clients?.map((c) => (
+                  <option key={c.id} value={c.id}>{c.name}</option>
+                ))}
+              </select>
+            </div>
           </div>
 
           <div className="flex flex-wrap items-center gap-x-6 gap-y-2 pt-2">

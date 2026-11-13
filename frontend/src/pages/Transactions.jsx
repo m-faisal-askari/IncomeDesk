@@ -3,7 +3,7 @@ import { useSearchParams } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { 
   Plus, Search, Download, Upload, ArrowUpRight, ArrowDownRight, 
-  ArrowLeftRight, Trash2, Edit3, Pencil, Filter, CheckCircle2, AlertCircle 
+  ArrowLeftRight, Trash2, Edit3, Pencil, Filter, CheckCircle2, AlertCircle, Briefcase
 } from 'lucide-react';
 import { api } from '../api/client';
 import { Modal } from '../components/Modal';
@@ -92,6 +92,11 @@ export function Transactions() {
     queryFn: () => api.get('/clients'),
   });
 
+  const { data: projects } = useQuery({
+    queryKey: ['projects'],
+    queryFn: () => api.get('/projects'),
+  });
+
   // Mutations
   const createTxMutation = useMutation({
     mutationFn: (newTx) => api.post('/transactions', newTx),
@@ -99,6 +104,7 @@ export function Transactions() {
       queryClient.invalidateQueries(['transactions']);
       queryClient.invalidateQueries(['dashboardSummary']);
       queryClient.invalidateQueries(['accounts']);
+      queryClient.invalidateQueries(['projects']);
       setIsModalOpen(false);
       setForm({
         type: 'EXPENSE',
@@ -128,6 +134,7 @@ export function Transactions() {
       queryClient.invalidateQueries(['transactions']);
       queryClient.invalidateQueries(['dashboardSummary']);
       queryClient.invalidateQueries(['accounts']);
+      queryClient.invalidateQueries(['projects']);
       setIsEditModalOpen(false);
       showSuccess(`Transaction "${res.description}" updated.`);
     },
@@ -142,6 +149,7 @@ export function Transactions() {
       queryClient.invalidateQueries(['transactions']);
       queryClient.invalidateQueries(['dashboardSummary']);
       queryClient.invalidateQueries(['accounts']);
+      queryClient.invalidateQueries(['projects']);
       showSuccess('Transaction deleted.');
     },
     onError: (err) => {
@@ -316,7 +324,15 @@ export function Transactions() {
                     </td>
                     <td className="py-3 px-4">
                       <div className="font-semibold text-slate-900">{tx.description}</div>
-                      {tx.client_name && <div className="text-[10px] text-slate-400">Client: {tx.client_name}</div>}
+                      <div className="flex items-center gap-2 text-[10px] text-slate-400">
+                        {tx.client_name && <span>Client: {tx.client_name}</span>}
+                        {tx.project_name && (
+                          <span className="inline-flex items-center gap-0.5 text-indigo-600 font-medium">
+                            <Briefcase className="w-2.5 h-2.5" />
+                            {tx.project_name}
+                          </span>
+                        )}
+                      </div>
                     </td>
                     <td className="py-3 px-4 text-slate-600 whitespace-nowrap">{tx.category_name || '—'}</td>
                     <td className="py-3 px-4 text-slate-600 whitespace-nowrap">{tx.account_name || '—'}</td>
@@ -522,6 +538,45 @@ export function Transactions() {
             </div>
           )}
 
+          {form.type !== 'TRANSFER' && (
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div>
+                <label className="block text-xs font-medium text-slate-700 mb-1">Project (Optional)</label>
+                <select
+                  value={form.project_id}
+                  onChange={(e) => {
+                    const pid = e.target.value;
+                    const proj = projects?.find(p => p.id === pid);
+                    setForm(prev => ({
+                      ...prev,
+                      project_id: pid,
+                      client_id: proj?.client_id || prev.client_id
+                    }));
+                  }}
+                  className="w-full px-3 py-2 rounded-lg border border-slate-200 focus:ring-2 focus:ring-indigo-500"
+                >
+                  <option value="">No Project Linked</option>
+                  {projects?.map((p) => (
+                    <option key={p.id} value={p.id}>{p.name} {p.client_name ? `(${p.client_name})` : ''}</option>
+                  ))}
+                </select>
+              </div>
+              <div>
+                <label className="block text-xs font-medium text-slate-700 mb-1">Client (Optional)</label>
+                <select
+                  value={form.client_id}
+                  onChange={(e) => setForm({ ...form, client_id: e.target.value })}
+                  className="w-full px-3 py-2 rounded-lg border border-slate-200 focus:ring-2 focus:ring-indigo-500"
+                >
+                  <option value="">No Client Linked</option>
+                  {clients?.map((c) => (
+                    <option key={c.id} value={c.id}>{c.name}</option>
+                  ))}
+                </select>
+              </div>
+            </div>
+          )}
+
           {/* Classification toggles */}
           <div className="flex items-center gap-6 pt-2">
             <label className="flex items-center gap-2 cursor-pointer">
@@ -715,6 +770,45 @@ export function Transactions() {
                   <option key={a.id} value={a.id}>{a.name} ({formatCurrency(a.current_balance, a.currency)})</option>
                 ))}
               </select>
+            </div>
+          )}
+
+          {editForm.type !== 'TRANSFER' && (
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div>
+                <label className="block text-xs font-medium text-slate-700 mb-1">Project (Optional)</label>
+                <select
+                  value={editForm.project_id}
+                  onChange={(e) => {
+                    const pid = e.target.value;
+                    const proj = projects?.find(p => p.id === pid);
+                    setEditForm(prev => ({
+                      ...prev,
+                      project_id: pid,
+                      client_id: proj?.client_id || prev.client_id
+                    }));
+                  }}
+                  className="w-full px-3 py-2 rounded-lg border border-slate-200 focus:ring-2 focus:ring-indigo-500"
+                >
+                  <option value="">No Project Linked</option>
+                  {projects?.map((p) => (
+                    <option key={p.id} value={p.id}>{p.name} {p.client_name ? `(${p.client_name})` : ''}</option>
+                  ))}
+                </select>
+              </div>
+              <div>
+                <label className="block text-xs font-medium text-slate-700 mb-1">Client (Optional)</label>
+                <select
+                  value={editForm.client_id}
+                  onChange={(e) => setEditForm({ ...editForm, client_id: e.target.value })}
+                  className="w-full px-3 py-2 rounded-lg border border-slate-200 focus:ring-2 focus:ring-indigo-500"
+                >
+                  <option value="">No Client Linked</option>
+                  {clients?.map((c) => (
+                    <option key={c.id} value={c.id}>{c.name}</option>
+                  ))}
+                </select>
+              </div>
             </div>
           )}
 

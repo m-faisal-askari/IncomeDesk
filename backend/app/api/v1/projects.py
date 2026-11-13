@@ -12,13 +12,14 @@ from backend.app.engine.money import to_cents, from_cents, convert
 
 router = APIRouter(prefix="/projects", tags=["Projects"])
 
-def enrich_project(project: Project, db: Session) -> dict:
+def enrich_project(project: Project, db: Session, include_details: bool = True) -> dict:
     invoices = db.query(Invoice).filter(
         Invoice.project_id == project.id,
         Invoice.status != InvoiceStatus.CANCELLED
     ).all()
     # inv.amount_paid is integer cents
     revenue = sum((from_cents(inv.amount_paid) for inv in invoices), Decimal("0.00"))
+    invoiced_total = sum((from_cents(inv.total_amount) for inv in invoices), Decimal("0.00"))
 
     # Also check any direct income transactions tagged to project without invoice
     direct_income = db.query(Transaction).filter(
@@ -38,14 +39,18 @@ def enrich_project(project: Project, db: Session) -> dict:
         Transaction.project_id == project.id,
         Transaction.type == TransactionType.EXPENSE,
         Transaction.status == "CONFIRMED"
-    ).all()
+    ).order_by(Transaction.date.desc()).all()
     # tx.amount is integer cents
     total_expenses = sum((from_cents(tx.amount) for tx in expenses), Decimal("0.00"))
 
     profit = revenue - total_expenses
     profit_margin = ((profit / revenue) * Decimal("100.00")) if revenue > 0 else Decimal("0.00")
 
-    return {
+    budget_amount = from_cents(project.budget)
+    budget_remaining = (budget_amount - total_expenses) if budget_amount > Decimal("0.00") else None
+    budget_spent_percent = ((total_expenses / budget_amount) * Decimal("100.00")) if budget_amount > Decimal("0.00") else Decimal("0.00")
+
+    result = {
         "id": project.id,
         "user_id": project.user_id,
         "client_id": project.client_id,
@@ -54,17 +59,51 @@ def enrich_project(project: Project, db: Session) -> dict:
         "description": project.description,
         "agreed_amount": from_cents(project.agreed_amount),
         "currency": project.currency,
-        "budget": from_cents(project.budget),
+        "budget": budget_amount,
+        "budget_remaining": round_money(budget_remaining) if budget_remaining is not None else None,
+        "budget_spent_percent": round_money(budget_spent_percent),
         "status": project.status,
         "start_date": project.start_date,
         "end_date": project.end_date,
         "created_at": project.created_at,
         "updated_at": project.updated_at,
+        "invoiced_total": round_money(invoiced_total),
         "revenue": round_money(revenue),
         "expenses": round_money(total_expenses),
         "profit": round_money(profit),
-        "profit_margin_percent": round_money(profit_margin)
+        "profit_margin_percent": round_money(profit_margin),
+        "invoices_count": len(invoices),
+        "expenses_count": len(expenses)
     }
+
+    if include_details:
+        result["invoices"] = [
+            {
+                "id": inv.id,
+                "invoice_number": inv.invoice_number,
+                "status": inv.status.value if hasattr(inv.status, "value") else str(inv.status),
+                "total_amount": from_cents(inv.total_amount),
+                "balance_due": from_cents(inv.balance_due),
+                "amount_paid": from_cents(inv.amount_paid),
+                "due_date": inv.due_date,
+                "currency": inv.currency
+            }
+            for inv in invoices
+        ]
+        result["expenses_list"] = [
+            {
+                "id": tx.id,
+                "description": tx.description,
+                "amount": from_cents(tx.amount),
+                "currency": tx.currency,
+                "date": tx.date,
+                "category_name": tx.category.name if tx.category else None,
+                "receipt_url": tx.receipt_url
+            }
+            for tx in expenses
+        ]
+
+    return result
 
 @router.get("", response_model=List[dict])
 def get_projects(client_id: Optional[str] = None, user_id: str = Depends(get_current_user_id), db: Session = Depends(get_db)):

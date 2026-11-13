@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useLocation } from 'react-router-dom';
-import { Plus, Download, DollarSign, Ban, Trash2, Calendar, FileText, Edit3 } from 'lucide-react';
+import { Plus, Download, DollarSign, Ban, Trash2, Calendar, FileText, Edit3, Sparkles, Layers, Briefcase, ChevronDown } from 'lucide-react';
 import { api } from '../api/client';
 import { Modal } from '../components/Modal';
 import { FieldHint } from '../components/FieldHints';
@@ -13,6 +13,104 @@ import { useToast } from '../contexts/ToastContext';
 import { useCurrency } from '../contexts/CurrencyContext';
 import { MetricCard } from '../components/MetricCard';
 
+const INVOICE_ITEM_PRESETS = [
+  {
+    category: 'Film, Video & Photography',
+    items: [
+      { description: 'Director / DP Day Rate (10 hrs)', quantity: '1', unit_price: '1200.00' },
+      { description: 'Cinematographer Half-Day Shoot (5 hrs)', quantity: '1', unit_price: '650.00' },
+      { description: 'Camera & Cinema Lens Package Kit Fee', quantity: '1', unit_price: '600.00' },
+      { description: 'Sound Recordist & Wireless Audio Package', quantity: '1', unit_price: '550.00' },
+      { description: 'Post-Production: Editing & Color Grade Pass', quantity: '1', unit_price: '1500.00' },
+      { description: 'Drone Aerial Cinematography & Licensing', quantity: '1', unit_price: '450.00' },
+      { description: 'Location Tech Scout & Pre-Production Day', quantity: '1', unit_price: '400.00' },
+      { description: 'Production Assistant / Grip Day Rate', quantity: '1', unit_price: '300.00' }
+    ]
+  },
+  {
+    category: 'General Freelance & Consulting',
+    items: [
+      { description: 'Hourly Advisory & Consulting (10 hrs)', quantity: '10', unit_price: '100.00' },
+      { description: 'Monthly Professional Client Retainer', quantity: '1', unit_price: '2500.00' },
+      { description: 'Fixed Project Deliverable Fee', quantity: '1', unit_price: '5000.00' },
+      { description: 'Expedited / Rush Turnaround Surcharge', quantity: '1', unit_price: '500.00' },
+      { description: 'Strategic Planning & Feasibility Report', quantity: '1', unit_price: '1200.00' }
+    ]
+  },
+  {
+    category: 'Design & Software Development',
+    items: [
+      { description: 'UI/UX Design Sprint & Interactive Prototype', quantity: '1', unit_price: '1800.00' },
+      { description: 'Full-Stack Software Development Sprint', quantity: '1', unit_price: '3000.00' },
+      { description: 'API Integration & Database Schema Setup', quantity: '1', unit_price: '1500.00' },
+      { description: 'Monthly Cloud Infrastructure & Maintenance Retainer', quantity: '1', unit_price: '450.00' },
+      { description: 'Code Review, Security Audit & Optimization', quantity: '1', unit_price: '1000.00' }
+    ]
+  }
+];
+
+const MILESTONE_TEMPLATES = [
+  {
+    id: 'film_3_stage',
+    name: 'Production 3-Stage (50% / 25% / 25%)',
+    description: 'Standard film/video production: advance for shoot, rough cut, final master',
+    ratios: [
+      { name: 'Milestone 1: Pre-Production & Shoot Advance (50%)', ratio: 0.50 },
+      { name: 'Milestone 2: Rough Cut Review & Feedback (25%)', ratio: 0.25 },
+      { name: 'Milestone 3: Final Master Delivery & Color Grade (25%)', ratio: 0.25 }
+    ]
+  },
+  {
+    id: 'two_phase_50_50',
+    name: 'Standard 2-Phase (50% Deposit / 50% Final)',
+    description: 'Classic freelance model: 50% deposit before kickoff, 50% upon signoff',
+    ratios: [
+      { name: 'Phase 1: Project Mobilization & Kickoff Deposit (50%)', ratio: 0.50 },
+      { name: 'Phase 2: Final Deliverables Sign-off & Handover (50%)', ratio: 0.50 }
+    ]
+  },
+  {
+    id: 'agile_3_sprints',
+    name: 'Agile 3 Sprints (33.3% / 33.3% / 33.4%)',
+    description: 'Sprint-based roadmap: Discovery, Core Build, Final Launch',
+    ratios: [
+      { name: 'Sprint 1: Discovery, Architecture & Wireframes', ratio: 0.3333 },
+      { name: 'Sprint 2: Core Build & Milestone Integration', ratio: 0.3333 },
+      { name: 'Sprint 3: QA Testing, Deployment & Handoff', ratio: 0.3334 }
+    ]
+  },
+  {
+    id: 'four_quarters',
+    name: '4-Stage Milestone (25% each)',
+    description: 'Even distribution across 4 project phases',
+    ratios: [
+      { name: 'Milestone 1: Inception & Discovery (25%)', ratio: 0.25 },
+      { name: 'Milestone 2: Alpha Prototype & First Draft (25%)', ratio: 0.25 },
+      { name: 'Milestone 3: Beta Release & Client Revisions (25%)', ratio: 0.25 },
+      { name: 'Milestone 4: Final Acceptance & Asset Handover (25%)', ratio: 0.25 }
+    ]
+  }
+];
+
+const PAYMENT_TERMS_PRESETS = [
+  {
+    label: 'Net 30',
+    text: 'Payment due within 30 days via direct bank transfer or online gateway.'
+  },
+  {
+    label: 'Due on Receipt',
+    text: 'Payment due immediately upon receipt of invoice.'
+  },
+  {
+    label: 'Film & Shoot Terms',
+    text: '50% advance deposit due prior to production shoot date. Balance due upon delivery of final master files. Standard day rate is based on 10 hours; overtime is billed at 1.5x hourly rate.'
+  },
+  {
+    label: 'Milestone Terms',
+    text: 'Invoiced according to agreed milestone deliverables. Payment due within 14 days of deliverable handover.'
+  }
+];
+
 export function Invoices() {
   const queryClient = useQueryClient();
   const { showSuccess, showError } = useToast();
@@ -22,6 +120,12 @@ export function Invoices() {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isPaymentModalOpen, setIsPaymentModalOpen] = useState(false);
   const [selectedInvoice, setSelectedInvoice] = useState(null);
+
+  // Milestone Splitter State
+  const [isMilestoneModalOpen, setIsMilestoneModalOpen] = useState(false);
+  const [milestoneTotal, setMilestoneTotal] = useState('5000.00');
+  const [selectedMilestoneTemplate, setSelectedMilestoneTemplate] = useState(MILESTONE_TEMPLATES[0].id);
+  const [showPresetsDropdown, setShowPresetsDropdown] = useState(false);
 
   // Auto-open modal if ?new=1 is in URL
   useEffect(() => {
@@ -68,6 +172,40 @@ export function Invoices() {
     queryKey: ['accounts'],
     queryFn: () => api.get('/accounts'),
   });
+
+  const { data: projects } = useQuery({
+    queryKey: ['projects'],
+    queryFn: () => api.get('/projects'),
+  });
+
+  const applyPresetItem = (preset) => {
+    const isFirstEmpty = form.items.length === 1 && (!form.items[0].description || form.items[0].description === 'Service Item' || form.items[0].description === 'Software Development & Architecture' || form.items[0].description === 'Software Development & Consulting') && (parseFloat(form.items[0].unit_price) === 0 || form.items[0].unit_price === '50000.00');
+    if (isFirstEmpty) {
+      setForm({ ...form, items: [{ ...preset }] });
+    } else {
+      setForm({ ...form, items: [...form.items, { ...preset }] });
+    }
+    setShowPresetsDropdown(false);
+    showSuccess(`Added: ${preset.description}`);
+  };
+
+  const applyMilestoneTemplate = () => {
+    const template = MILESTONE_TEMPLATES.find(t => t.id === selectedMilestoneTemplate);
+    if (!template) return;
+    const total = parseFloat(milestoneTotal || 0);
+    if (total <= 0) {
+      showError('Please enter a valid milestone total contract amount.');
+      return;
+    }
+    const newItems = template.ratios.map(r => ({
+      description: r.name,
+      quantity: '1',
+      unit_price: (total * r.ratio).toFixed(2)
+    }));
+    setForm({ ...form, items: newItems });
+    setIsMilestoneModalOpen(false);
+    showSuccess(`Applied "${template.name}" milestone schedule.`);
+  };
 
   // Mutations
   const createInvoiceMutation = useMutation({
@@ -410,9 +548,9 @@ export function Invoices() {
       )}
 
       {/* Create Invoice Modal */}
-      <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} title="Create Professional Invoice" maxWidth="max-w-2xl">
+      <Modal isOpen={isModalOpen} onClose={() => { setIsModalOpen(false); setShowPresetsDropdown(false); }} title="Create Professional Invoice" maxWidth="max-w-3xl">
         <form onSubmit={handleCreate} className="space-y-4 text-xs">
-          <div className="grid grid-cols-1 sm:grid-cols-4 gap-3">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3">
             <div>
               <label className="block text-xs font-medium text-slate-700 mb-1">Invoice Number</label>
               <input
@@ -434,6 +572,27 @@ export function Invoices() {
                 <option value="">Select Client...</option>
                 {clients?.map((c) => (
                   <option key={c.id} value={c.id}>{c.name} {c.company_name ? `(${c.company_name})` : ''}</option>
+                ))}
+              </select>
+            </div>
+            <div>
+              <label className="block text-xs font-medium text-slate-700 mb-1">Project (Optional)</label>
+              <select
+                value={form.project_id}
+                onChange={(e) => {
+                  const pid = e.target.value;
+                  const proj = projects?.find(p => p.id === pid);
+                  setForm(prev => ({
+                    ...prev,
+                    project_id: pid,
+                    client_id: proj?.client_id || prev.client_id
+                  }));
+                }}
+                className="w-full px-3 py-2 rounded-lg border border-slate-200 focus:ring-2 focus:ring-indigo-500 font-medium"
+              >
+                <option value="">No Project Linked</option>
+                {projects?.map((p) => (
+                  <option key={p.id} value={p.id}>{p.name} {p.client_name ? `(${p.client_name})` : ''}</option>
                 ))}
               </select>
             </div>
@@ -464,17 +623,72 @@ export function Invoices() {
             </div>
           </div>
 
-          {/* Line items */}
+          {/* Line items with presets & milestone splitter */}
           <div>
-            <div className="flex items-center justify-between mb-2">
+            <div className="flex flex-wrap items-center justify-between gap-2 mb-2">
               <label className="text-xs font-semibold text-slate-800">Itemized Line Items</label>
-              <button
-                type="button"
-                onClick={addItem}
-                className="text-xs font-semibold text-indigo-600 hover:text-indigo-800 flex items-center gap-1"
-              >
-                <Plus className="w-3 h-3" /> Add Item
-              </button>
+              <div className="flex items-center gap-1.5">
+                {/* Milestone Splitter Trigger */}
+                <button
+                  type="button"
+                  onClick={() => {
+                    const currentTotal = form.items.reduce((s, it) => s + (parseFloat(it.quantity || 1) * parseFloat(it.unit_price || 0)), 0);
+                    if (currentTotal > 0) setMilestoneTotal(currentTotal.toFixed(2));
+                    setIsMilestoneModalOpen(true);
+                  }}
+                  className="inline-flex items-center gap-1 px-2.5 py-1 rounded-md bg-indigo-50 text-indigo-700 hover:bg-indigo-100 text-[11px] font-semibold transition"
+                >
+                  <Layers className="w-3 h-3" />
+                  Milestone Splitter
+                </button>
+
+                {/* Presets Dropdown */}
+                <div className="relative">
+                  <button
+                    type="button"
+                    onClick={() => setShowPresetsDropdown(!showPresetsDropdown)}
+                    className="inline-flex items-center gap-1 px-2.5 py-1 rounded-md bg-slate-100 text-slate-700 hover:bg-slate-200 text-[11px] font-semibold transition"
+                  >
+                    <Sparkles className="w-3 h-3 text-amber-500" />
+                    Presets
+                    <ChevronDown className="w-3 h-3" />
+                  </button>
+
+                  {showPresetsDropdown && (
+                    <div className="absolute right-0 mt-1 w-80 bg-white rounded-lg shadow-xl border border-slate-200 p-2 z-50 text-xs max-h-80 overflow-y-auto">
+                      <div className="text-[10px] font-bold uppercase text-slate-400 px-2 py-1">Quick Line Item Presets</div>
+                      {INVOICE_ITEM_PRESETS.map((group) => (
+                        <div key={group.category} className="mb-2">
+                          <div className="text-[10px] font-semibold text-indigo-600 bg-indigo-50/70 px-2 py-0.5 rounded mb-1">
+                            {group.category}
+                          </div>
+                          {group.items.map((preset, pIdx) => (
+                            <button
+                              key={pIdx}
+                              type="button"
+                              onClick={() => applyPresetItem(preset)}
+                              className="w-full text-left px-2 py-1.5 rounded hover:bg-slate-50 flex items-center justify-between text-slate-700 transition"
+                            >
+                              <span className="truncate pr-2 font-medium">{preset.description}</span>
+                              <span className="font-mono text-slate-400 font-semibold shrink-0">
+                                {formatCurrency(preset.unit_price, form.currency)}
+                              </span>
+                            </button>
+                          ))}
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+
+                <button
+                  type="button"
+                  onClick={addItem}
+                  className="inline-flex items-center gap-1 px-2.5 py-1 rounded-md bg-indigo-600 text-white hover:bg-indigo-700 text-[11px] font-semibold transition"
+                >
+                  <Plus className="w-3 h-3" /> Add Item
+                </button>
+              </div>
             </div>
 
             <div className="mb-1 hidden sm:flex items-center gap-2 px-1 text-[9px] font-semibold text-slate-500">
@@ -564,7 +778,22 @@ export function Invoices() {
           </div>
 
           <div>
-            <label className="block text-xs font-medium text-slate-700 mb-1">Payment Instructions</label>
+            <div className="flex flex-wrap items-center justify-between gap-1 mb-1">
+              <label className="block text-xs font-medium text-slate-700">Payment Instructions & Terms</label>
+              <div className="flex flex-wrap items-center gap-1">
+                <span className="text-[10px] text-slate-400">Quick Terms:</span>
+                {PAYMENT_TERMS_PRESETS.map((term, tIdx) => (
+                  <button
+                    key={tIdx}
+                    type="button"
+                    onClick={() => setForm({ ...form, payment_instructions: term.text })}
+                    className="px-1.5 py-0.5 rounded text-[10px] bg-slate-100 hover:bg-indigo-50 hover:text-indigo-600 text-slate-600 transition"
+                  >
+                    {term.label}
+                  </button>
+                ))}
+              </div>
+            </div>
             <textarea
               rows={2}
               value={form.payment_instructions}
@@ -576,7 +805,7 @@ export function Invoices() {
           <div className="flex justify-end gap-2 pt-4 border-t border-slate-100">
             <button
               type="button"
-              onClick={() => setIsModalOpen(false)}
+              onClick={() => { setIsModalOpen(false); setShowPresetsDropdown(false); }}
               className="px-4 py-2 rounded-lg border border-slate-200 text-slate-600 hover:bg-slate-50 transition"
             >
               Cancel
@@ -593,9 +822,9 @@ export function Invoices() {
       </Modal>
 
       {/* Edit Invoice Modal */}
-      <Modal isOpen={isEditModalOpen} onClose={() => setIsEditModalOpen(false)} title={`Edit Invoice #${selectedInvoice?.invoice_number}`} maxWidth="max-w-2xl">
+      <Modal isOpen={isEditModalOpen} onClose={() => { setIsEditModalOpen(false); setShowPresetsDropdown(false); }} title={`Edit Invoice #${selectedInvoice?.invoice_number}`} maxWidth="max-w-3xl">
         <form onSubmit={handleUpdate} className="space-y-4 text-xs">
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
             <div>
               <label className="block text-xs font-medium text-slate-700 mb-1">Client</label>
               <select
@@ -605,7 +834,28 @@ export function Invoices() {
                 className="w-full px-3 py-2 rounded-lg border border-slate-200 focus:ring-2 focus:ring-indigo-500"
               >
                 {clients?.map((c) => (
-                  <option key={c.id} value={c.id}>{c.name}</option>
+                  <option key={c.id} value={c.id}>{c.name} {c.company_name ? `(${c.company_name})` : ''}</option>
+                ))}
+              </select>
+            </div>
+            <div>
+              <label className="block text-xs font-medium text-slate-700 mb-1">Project (Optional)</label>
+              <select
+                value={form.project_id}
+                onChange={(e) => {
+                  const pid = e.target.value;
+                  const proj = projects?.find(p => p.id === pid);
+                  setForm(prev => ({
+                    ...prev,
+                    project_id: pid,
+                    client_id: proj?.client_id || prev.client_id
+                  }));
+                }}
+                className="w-full px-3 py-2 rounded-lg border border-slate-200 focus:ring-2 focus:ring-indigo-500 font-medium"
+              >
+                <option value="">No Project Linked</option>
+                {projects?.map((p) => (
+                  <option key={p.id} value={p.id}>{p.name} {p.client_name ? `(${p.client_name})` : ''}</option>
                 ))}
               </select>
             </div>
@@ -620,6 +870,8 @@ export function Invoices() {
                 <option value="USD">USD ($)</option>
                 <option value="EUR">EUR (€)</option>
                 <option value="GBP">GBP (£)</option>
+                <option value="CAD">CAD ($)</option>
+                <option value="AUD">AUD ($)</option>
               </select>
             </div>
             <div>
@@ -635,15 +887,68 @@ export function Invoices() {
           </div>
 
           <div>
-            <div className="flex items-center justify-between mb-2">
+            <div className="flex flex-wrap items-center justify-between gap-2 mb-2">
               <label className="text-xs font-semibold text-slate-800">Line Items</label>
-              <button
-                type="button"
-                onClick={addItem}
-                className="text-xs font-semibold text-indigo-600 hover:text-indigo-800 flex items-center gap-1"
-              >
-                <Plus className="w-3 h-3" /> Add Item
-              </button>
+              <div className="flex items-center gap-1.5">
+                <button
+                  type="button"
+                  onClick={() => {
+                    const currentTotal = form.items.reduce((s, it) => s + (parseFloat(it.quantity || 1) * parseFloat(it.unit_price || 0)), 0);
+                    if (currentTotal > 0) setMilestoneTotal(currentTotal.toFixed(2));
+                    setIsMilestoneModalOpen(true);
+                  }}
+                  className="inline-flex items-center gap-1 px-2.5 py-1 rounded-md bg-indigo-50 text-indigo-700 hover:bg-indigo-100 text-[11px] font-semibold transition"
+                >
+                  <Layers className="w-3 h-3" />
+                  Milestone Splitter
+                </button>
+
+                <div className="relative">
+                  <button
+                    type="button"
+                    onClick={() => setShowPresetsDropdown(!showPresetsDropdown)}
+                    className="inline-flex items-center gap-1 px-2.5 py-1 rounded-md bg-slate-100 text-slate-700 hover:bg-slate-200 text-[11px] font-semibold transition"
+                  >
+                    <Sparkles className="w-3 h-3 text-amber-500" />
+                    Presets
+                    <ChevronDown className="w-3 h-3" />
+                  </button>
+
+                  {showPresetsDropdown && (
+                    <div className="absolute right-0 mt-1 w-80 bg-white rounded-lg shadow-xl border border-slate-200 p-2 z-50 text-xs max-h-80 overflow-y-auto">
+                      <div className="text-[10px] font-bold uppercase text-slate-400 px-2 py-1">Quick Line Item Presets</div>
+                      {INVOICE_ITEM_PRESETS.map((group) => (
+                        <div key={group.category} className="mb-2">
+                          <div className="text-[10px] font-semibold text-indigo-600 bg-indigo-50/70 px-2 py-0.5 rounded mb-1">
+                            {group.category}
+                          </div>
+                          {group.items.map((preset, pIdx) => (
+                            <button
+                              key={pIdx}
+                              type="button"
+                              onClick={() => applyPresetItem(preset)}
+                              className="w-full text-left px-2 py-1.5 rounded hover:bg-slate-50 flex items-center justify-between text-slate-700 transition"
+                            >
+                              <span className="truncate pr-2 font-medium">{preset.description}</span>
+                              <span className="font-mono text-slate-400 font-semibold shrink-0">
+                                {formatCurrency(preset.unit_price, form.currency)}
+                              </span>
+                            </button>
+                          ))}
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+
+                <button
+                  type="button"
+                  onClick={addItem}
+                  className="inline-flex items-center gap-1 px-2.5 py-1 rounded-md bg-indigo-600 text-white hover:bg-indigo-700 text-[11px] font-semibold transition"
+                >
+                  <Plus className="w-3 h-3" /> Add Item
+                </button>
+              </div>
             </div>
 
             <div className="mb-1 hidden sm:flex items-center gap-2 px-1 text-[9px] font-semibold text-slate-500">
@@ -724,7 +1029,22 @@ export function Invoices() {
           </div>
 
           <div>
-            <label className="block text-xs font-medium text-slate-700 mb-1">Payment Instructions</label>
+            <div className="flex flex-wrap items-center justify-between gap-1 mb-1">
+              <label className="block text-xs font-medium text-slate-700">Payment Instructions & Terms</label>
+              <div className="flex flex-wrap items-center gap-1">
+                <span className="text-[10px] text-slate-400">Quick Terms:</span>
+                {PAYMENT_TERMS_PRESETS.map((term, tIdx) => (
+                  <button
+                    key={tIdx}
+                    type="button"
+                    onClick={() => setForm({ ...form, payment_instructions: term.text })}
+                    className="px-1.5 py-0.5 rounded text-[10px] bg-slate-100 hover:bg-indigo-50 hover:text-indigo-600 text-slate-600 transition"
+                  >
+                    {term.label}
+                  </button>
+                ))}
+              </div>
+            </div>
             <textarea
               rows={2}
               value={form.payment_instructions}
@@ -736,7 +1056,7 @@ export function Invoices() {
           <div className="flex justify-end gap-2 pt-4 border-t border-slate-100">
             <button
               type="button"
-              onClick={() => setIsEditModalOpen(false)}
+              onClick={() => { setIsEditModalOpen(false); setShowPresetsDropdown(false); }}
               className="px-4 py-2 rounded-lg border border-slate-200 text-slate-600 hover:bg-slate-50 transition"
             >
               Cancel
@@ -750,6 +1070,78 @@ export function Invoices() {
             </button>
           </div>
         </form>
+      </Modal>
+
+      {/* Milestone Splitter Modal */}
+      <Modal isOpen={isMilestoneModalOpen} onClose={() => setIsMilestoneModalOpen(false)} title="Milestone Billing Schedule">
+        <div className="space-y-4 text-xs">
+          <p className="text-slate-500">
+            Automatically calculate and generate milestone line items based on industry billing schedules. Perfect for film productions, retainer contracts, and fixed-scope software deliverables.
+          </p>
+
+          <div>
+            <label className="block text-xs font-medium text-slate-700 mb-1">Total Project Contract Value ({form.currency})</label>
+            <input
+              type="number"
+              step="0.01"
+              value={milestoneTotal}
+              onChange={(e) => setMilestoneTotal(e.target.value)}
+              className="w-full px-3 py-2 rounded-lg border border-slate-200 font-bold text-sm focus:ring-2 focus:ring-indigo-500"
+            />
+          </div>
+
+          <div>
+            <label className="block text-xs font-medium text-slate-700 mb-1.5">Select Milestone Structure</label>
+            <div className="space-y-2">
+              {MILESTONE_TEMPLATES.map((tmpl) => (
+                <div
+                  key={tmpl.id}
+                  onClick={() => setSelectedMilestoneTemplate(tmpl.id)}
+                  className={`block p-3 rounded-lg border cursor-pointer transition ${
+                    selectedMilestoneTemplate === tmpl.id
+                      ? 'border-indigo-600 bg-indigo-50/50 ring-1 ring-indigo-600'
+                      : 'border-slate-200 hover:bg-slate-50'
+                  }`}
+                >
+                  <div className="flex items-center justify-between mb-1">
+                    <span className="font-bold text-slate-900">{tmpl.name}</span>
+                    <span className="text-[10px] font-semibold text-indigo-600 bg-white px-2 py-0.5 rounded border border-indigo-200">
+                      {tmpl.ratios.length} Milestones
+                    </span>
+                  </div>
+                  <p className="text-slate-500 text-[11px] mb-2">{tmpl.description}</p>
+                  <div className="space-y-1 bg-white p-2 rounded border border-slate-100">
+                    {tmpl.ratios.map((r, rIdx) => (
+                      <div key={rIdx} className="flex justify-between text-[11px] text-slate-600">
+                        <span>{r.name}</span>
+                        <span className="font-mono font-semibold text-slate-900">
+                          {formatCurrency((parseFloat(milestoneTotal || 0) * r.ratio).toFixed(2), form.currency)}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <div className="flex justify-end gap-2 pt-4 border-t border-slate-100">
+            <button
+              type="button"
+              onClick={() => setIsMilestoneModalOpen(false)}
+              className="px-4 py-2 rounded-lg border border-slate-200 text-slate-600 hover:bg-slate-50 transition"
+            >
+              Cancel
+            </button>
+            <button
+              type="button"
+              onClick={applyMilestoneTemplate}
+              className="px-4 py-2 rounded-lg bg-indigo-600 text-white font-semibold hover:bg-indigo-700 shadow-sm transition"
+            >
+              Apply to Invoice
+            </button>
+          </div>
+        </div>
       </Modal>
 
       {/* Record Payment Modal */}
