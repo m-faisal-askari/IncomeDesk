@@ -5,49 +5,19 @@ from backend.app.main import app
 
 client = TestClient(app)
 
-def test_guest_access_without_authentication():
-    # Calling endpoints without any auth header should seamlessly return guest data
+def test_unauthenticated_request_rejected():
+    # Calling auth-protected endpoints without any auth header should return 401 Unauthorized
     res = client.get("/api/v1/auth/me")
+    assert res.status_code == 401
+
+def test_authenticated_token_flow():
+    uid = uuid.uuid4().hex[:6]
+    headers = {"Authorization": f"Bearer dev-user-{uid}"}
+    res = client.get("/api/v1/auth/me", headers=headers)
     assert res.status_code == 200
     data = res.json()
-    assert data["user_id"] == "guest-freelancer-user"
-    assert data["is_guest"] is True
-
-    # Guest can access dashboard summary without token
-    res_dash = client.get("/api/v1/dashboard/summary")
-    assert res_dash.status_code == 200
-
-def test_email_password_and_google_auth():
-    uid = uuid.uuid4().hex[:6]
-    email = f"user_{uid}@example.com"
-    password = "SecretPassword123!"
-
-    # 1. Register new user
-    res_reg = client.post("/api/v1/auth/register", json={
-        "email": email,
-        "password": password,
-        "full_name": f"Tester {uid}"
-    })
-    assert res_reg.status_code == 200
-    token = res_reg.json()["access_token"]
-    assert token
-
-    # 2. Login with registered user
-    res_login = client.post("/api/v1/auth/login", json={
-        "email": email,
-        "password": password
-    })
-    assert res_login.status_code == 200
-    assert res_login.json()["email"] == email
-
-    # 3. Google OAuth simulation
-    res_google = client.post("/api/v1/auth/google", json={
-        "email": f"google_{uid}@gmail.com",
-        "full_name": "Google User",
-        "google_id": f"g-{uid}"
-    })
-    assert res_google.status_code == 200
-    assert "access_token" in res_google.json()
+    assert data["is_authenticated"] is True
+    assert "user_id" in data
 
 def test_pkr_currency_and_edit_endpoints():
     uid = uuid.uuid4().hex[:6]

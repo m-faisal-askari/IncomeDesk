@@ -6,7 +6,7 @@ from sqlalchemy.orm import Session
 
 from backend.app.core.database import get_db
 from backend.app.core.security import get_current_user_id
-from backend.app.models.models import Subscription, BillingFrequency, Transaction, TransactionType, UserProfile
+from backend.app.models.models import Subscription, BillingFrequency, Transaction, TransactionType, UserProfile, Category
 from backend.app.schemas.schemas import SubscriptionCreate, SubscriptionUpdate, SubscriptionResponse
 from backend.app.engine.calculations import to_decimal, round_money, FinancialEngine
 from backend.app.engine.money import to_cents, from_cents
@@ -109,6 +109,17 @@ def confirm_subscription_payment(sub_id: str, payment_date: date = date.today(),
     if not sub:
         raise HTTPException(status_code=404, detail="Subscription not found.")
 
+    # Auto-resolve category if not set on the subscription
+    category_id = sub.category_id
+    if not category_id:
+        soft_cat = db.query(Category).filter(
+            Category.user_id == user_id,
+            Category.type == "EXPENSE",
+            Category.name.ilike("%Software%")
+        ).first()
+        if soft_cat:
+            category_id = soft_cat.id
+
     # Create confirmed expense transaction — sub.amount is already integer cents
     tx = Transaction(
         user_id=user_id,
@@ -119,7 +130,7 @@ def confirm_subscription_payment(sub_id: str, payment_date: date = date.today(),
         description=f"Subscription: {sub.name}",
         date=payment_date,
         source_account_id=sub.account_id,
-        category_id=sub.category_id,
+        category_id=category_id,
         is_business=True,
         is_tax_deductible=True,
         status="CONFIRMED",

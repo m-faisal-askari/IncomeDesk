@@ -54,6 +54,7 @@ export function Subscriptions() {
     billing_frequency: 'MONTHLY',
     next_payment_date: new Date().toISOString().split('T')[0],
     account_id: '',
+    category_id: '',
     notes: ''
   });
 
@@ -66,6 +67,14 @@ export function Subscriptions() {
     queryKey: ['accounts'],
     queryFn: () => api.get('/accounts'),
   });
+
+  const { data: categories } = useQuery({
+    queryKey: ['categories'],
+    queryFn: () => api.get('/categories'),
+  });
+
+  const expenseCategories = categories?.filter(c => c.type === 'EXPENSE') || [];
+  const defaultSoftwareCat = expenseCategories.find(c => c.name.toLowerCase().includes('software'))?.id || '';
 
   const createSubMutation = useMutation({
     mutationFn: (newSub) => api.post('/subscriptions', newSub),
@@ -160,6 +169,7 @@ export function Subscriptions() {
       billing_frequency: s.billing_frequency || 'MONTHLY',
       next_payment_date: s.next_payment_date || new Date().toISOString().split('T')[0],
       account_id: s.account_id || '',
+      category_id: s.category_id || defaultSoftwareCat,
       notes: s.notes || ''
     });
     setIsEditModalOpen(true);
@@ -174,6 +184,7 @@ export function Subscriptions() {
       billing_frequency: preset.billing_frequency,
       next_payment_date: new Date().toISOString().split('T')[0],
       account_id: accounts?.[0]?.id || '',
+      category_id: defaultSoftwareCat,
       notes: preset.notes
     });
     setShowPresetsDropdown(false);
@@ -282,6 +293,7 @@ export function Subscriptions() {
                 <tr className="bg-slate-50/80 border-b border-slate-200 text-slate-500 font-semibold uppercase tracking-wider text-[10px]">
                   <th className="py-3 px-4">Subscription</th>
                   <th className="py-3 px-4">Vendor</th>
+                  <th className="py-3 px-4">Category</th>
                   <th className="py-3 px-4">Frequency</th>
                   <th className="py-3 px-4">Next Renewal</th>
                   <th className="py-3 px-4 text-right">Amount</th>
@@ -293,6 +305,11 @@ export function Subscriptions() {
                   <tr key={s.id} className="hover:bg-slate-50/70 transition">
                     <td className="py-3 px-4 font-semibold text-slate-900">{s.name}</td>
                     <td className="py-3 px-4 text-slate-600">{s.vendor || '—'}</td>
+                    <td className="py-3 px-4 text-slate-600">
+                      <span className="px-2 py-0.5 rounded-full bg-indigo-50 text-[10px] font-medium text-indigo-700">
+                        {expenseCategories.find(c => c.id === s.category_id)?.name || 'Software & Subscriptions'}
+                      </span>
+                    </td>
                     <td className="py-3 px-4 text-slate-600">
                       <span className="px-2 py-0.5 rounded-full bg-slate-100 text-[10px] font-medium text-slate-700">
                         {s.billing_frequency}
@@ -465,6 +482,35 @@ export function Subscriptions() {
             </div>
           </div>
 
+          <div className="grid grid-cols-2 gap-3">
+            <div>
+              <label className="block text-xs font-medium text-slate-700 mb-1">Expense Category</label>
+              <select
+                value={form.category_id}
+                onChange={(e) => setForm({ ...form, category_id: e.target.value })}
+                className="w-full px-3 py-2 rounded-lg border border-slate-200"
+              >
+                <option value="">Software & Subscriptions (Default)</option>
+                {expenseCategories.map((c) => (
+                  <option key={c.id} value={c.id}>{c.name}</option>
+                ))}
+              </select>
+            </div>
+            <div>
+              <label className="block text-xs font-medium text-slate-700 mb-1">Paid From Account</label>
+              <select
+                value={form.account_id}
+                onChange={(e) => setForm({ ...form, account_id: e.target.value })}
+                className="w-full px-3 py-2 rounded-lg border border-slate-200"
+              >
+                <option value="">Select Account...</option>
+                {accounts?.map((a) => (
+                  <option key={a.id} value={a.id}>{a.name} ({formatCurrency(a.current_balance, a.currency)})</option>
+                ))}
+              </select>
+            </div>
+          </div>
+
           <div className="flex justify-end gap-2 pt-4 border-t border-slate-100">
             <button
               type="button"
@@ -561,6 +607,35 @@ export function Subscriptions() {
                 onChange={(e) => setForm({ ...form, next_payment_date: e.target.value })}
                 className="w-full px-3 py-2 rounded-lg border border-slate-200"
               />
+            </div>
+          </div>
+
+          <div className="grid grid-cols-2 gap-3">
+            <div>
+              <label className="block text-xs font-medium text-slate-700 mb-1">Expense Category</label>
+              <select
+                value={form.category_id}
+                onChange={(e) => setForm({ ...form, category_id: e.target.value })}
+                className="w-full px-3 py-2 rounded-lg border border-slate-200"
+              >
+                <option value="">Software & Subscriptions (Default)</option>
+                {expenseCategories.map((c) => (
+                  <option key={c.id} value={c.id}>{c.name}</option>
+                ))}
+              </select>
+            </div>
+            <div>
+              <label className="block text-xs font-medium text-slate-700 mb-1">Paid From Account</label>
+              <select
+                value={form.account_id}
+                onChange={(e) => setForm({ ...form, account_id: e.target.value })}
+                className="w-full px-3 py-2 rounded-lg border border-slate-200"
+              >
+                <option value="">Select Account...</option>
+                {accounts?.map((a) => (
+                  <option key={a.id} value={a.id}>{a.name} ({formatCurrency(a.current_balance, a.currency)})</option>
+                ))}
+              </select>
             </div>
           </div>
 

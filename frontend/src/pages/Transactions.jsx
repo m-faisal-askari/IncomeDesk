@@ -334,7 +334,16 @@ export function Transactions() {
                         )}
                       </div>
                     </td>
-                    <td className="py-3 px-4 text-slate-600 whitespace-nowrap">{tx.category_name || '—'}</td>
+                    <td className="py-3 px-4 whitespace-nowrap">
+                      {tx.category_name ? (
+                        <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[10px] font-medium bg-slate-100 text-slate-700">
+                          <span className={`w-1.5 h-1.5 rounded-full ${tx.type === 'INCOME' ? 'bg-emerald-500' : 'bg-indigo-500'}`} />
+                          {tx.category_name}
+                        </span>
+                      ) : (
+                        <span className="text-slate-400 text-[11px]">—</span>
+                      )}
+                    </td>
                     <td className="py-3 px-4 text-slate-600 whitespace-nowrap">{tx.account_name || '—'}</td>
                     <td className="py-3 px-4 whitespace-nowrap">
                       {tx.is_business ? (

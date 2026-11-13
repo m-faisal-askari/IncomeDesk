@@ -8,7 +8,7 @@ from backend.app.core.database import get_db
 from backend.app.core.security import get_current_user_id
 from backend.app.models.models import (
     Invoice, InvoiceItem, InvoicePayment, InvoiceStatus, Client, Project, 
-    Transaction, TransactionType, Account, UserProfile
+    Transaction, TransactionType, Account, UserProfile, Category
 )
 from backend.app.schemas.schemas import (
     InvoiceCreate, InvoiceUpdate, InvoiceResponse, InvoicePaymentCreate, InvoicePaymentResponse
@@ -247,6 +247,13 @@ def record_invoice_payment(
     if not account:
         raise HTTPException(status_code=400, detail="Selected account does not exist.")
 
+    # Look up income category (Client Projects)
+    client_proj_cat = db.query(Category).filter(
+        Category.user_id == user_id,
+        Category.type == "INCOME",
+        Category.name.ilike("%Client Project%")
+    ).first()
+
     # 1. Create linked INCOME transaction (amounts in cents)
     tx = Transaction(
         user_id=user_id,
@@ -257,6 +264,7 @@ def record_invoice_payment(
         description=f"Payment received for Invoice #{inv.invoice_number}",
         date=data.payment_date,
         destination_account_id=account.id,
+        category_id=client_proj_cat.id if client_proj_cat else None,
         client_id=inv.client_id,
         project_id=inv.project_id,
         is_business=True,

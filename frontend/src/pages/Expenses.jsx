@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { TrendingDown, Briefcase, User, ShieldCheck, Plus, Trash2, Pencil } from 'lucide-react';
+import { TrendingDown, Briefcase, User, ShieldCheck, Plus, Trash2, Pencil, Tag } from 'lucide-react';
 import { api } from '../api/client';
 import { MetricCard } from '../components/MetricCard';
 import { LoadingSpinner } from '../components/LoadingSpinner';
@@ -72,6 +72,35 @@ export function Expenses() {
   });
 
   const expenseCategories = categories?.filter(c => c.type === 'EXPENSE') || [];
+
+  const [selectedCategoryFilter, setSelectedCategoryFilter] = useState('ALL');
+  const [isCreatingCat, setIsCreatingCat] = useState(false);
+  const [newCatName, setNewCatName] = useState('');
+  const [newCatDeductible, setNewCatDeductible] = useState(true);
+
+  const createCategoryMutation = useMutation({
+    mutationFn: (newCat) => api.post('/categories', newCat),
+    onSuccess: (res) => {
+      queryClient.invalidateQueries(['categories']);
+      setForm(prev => ({
+        ...prev,
+        category_id: res.id,
+        is_tax_deductible: res.is_tax_deductible
+      }));
+      setEditForm(prev => ({
+        ...prev,
+        category_id: res.id,
+        is_tax_deductible: res.is_tax_deductible
+      }));
+      setIsCreatingCat(false);
+      setNewCatName('');
+      setNewCatDeductible(true);
+      showSuccess(`Custom category "${res.name}" created.`);
+    },
+    onError: (err) => {
+      showError(err.message, 'Could not create category');
+    }
+  });
 
   const createExpenseMutation = useMutation({
     mutationFn: (newTx) => api.post('/transactions', {
@@ -159,11 +188,17 @@ export function Expenses() {
     setIsEditModalOpen(true);
   };
 
-  const txs = transactions || [];
-  const totalExpenses = txs.reduce((sum, t) => sum + convert(parseFloat(t.amount || 0), t.currency), 0);
-  const businessExpenses = txs.filter(t => t.is_business).reduce((sum, t) => sum + convert(parseFloat(t.amount || 0), t.currency), 0);
-  const personalExpenses = txs.filter(t => !t.is_business).reduce((sum, t) => sum + convert(parseFloat(t.amount || 0), t.currency), 0);
-  const deductibleExpenses = txs.filter(t => t.is_business && t.is_tax_deductible).reduce((sum, t) => sum + convert(parseFloat(t.amount || 0), t.currency), 0);
+  const allTxs = transactions || [];
+  const txs = selectedCategoryFilter === 'ALL'
+    ? allTxs
+    : selectedCategoryFilter === 'UNCATEGORIZED'
+      ? allTxs.filter(t => !t.category_id)
+      : allTxs.filter(t => t.category_id === selectedCategoryFilter);
+
+  const totalExpenses = allTxs.reduce((sum, t) => sum + convert(parseFloat(t.amount || 0), t.currency), 0);
+  const businessExpenses = allTxs.filter(t => t.is_business).reduce((sum, t) => sum + convert(parseFloat(t.amount || 0), t.currency), 0);
+  const personalExpenses = allTxs.filter(t => !t.is_business).reduce((sum, t) => sum + convert(parseFloat(t.amount || 0), t.currency), 0);
+  const deductibleExpenses = allTxs.filter(t => t.is_business && t.is_tax_deductible).reduce((sum, t) => sum + convert(parseFloat(t.amount || 0), t.currency), 0);
 
   return (
     <div className="space-y-6">
@@ -233,6 +268,31 @@ export function Expenses() {
         />
       ) : (
         <div className="bg-white rounded-xl border border-slate-200/80 overflow-hidden shadow-xs">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 px-4 py-3 bg-slate-50/50 border-b border-slate-100">
+            <div className="flex items-center gap-2">
+              <Tag className="w-3.5 h-3.5 text-slate-400" />
+              <span className="text-xs font-medium text-slate-600">Category Filter:</span>
+              <select
+                value={selectedCategoryFilter}
+                onChange={(e) => setSelectedCategoryFilter(e.target.value)}
+                className="text-xs px-2.5 py-1 rounded-lg border border-slate-200 bg-white font-medium text-slate-700 focus:ring-1 focus:ring-indigo-500"
+              >
+                <option value="ALL">All Categories ({allTxs.length})</option>
+                <option value="UNCATEGORIZED">Uncategorized ({allTxs.filter(t => !t.category_id).length})</option>
+                {expenseCategories.map(c => {
+                  const count = allTxs.filter(t => t.category_id === c.id).length;
+                  return (
+                    <option key={c.id} value={c.id}>
+                      {c.name} {count > 0 ? `(${count})` : ''}
+                    </option>
+                  );
+                })}
+              </select>
+            </div>
+            <div className="text-[11px] text-slate-500">
+              Showing {txs.length} of {allTxs.length} records
+            </div>
+          </div>
           <div className="overflow-x-auto">
             <table className="w-full text-left border-collapse text-xs">
               <thead>
@@ -260,7 +320,18 @@ export function Expenses() {
                         </div>
                       )}
                     </td>
-                    <td className="py-3 px-4 text-slate-600 whitespace-nowrap">{tx.category_name || 'Expense'}</td>
+                    <td className="py-3 px-4 whitespace-nowrap">
+                      {tx.category_name ? (
+                        <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-medium bg-indigo-50/80 text-indigo-700 border border-indigo-100/60">
+                          <span className="w-1.5 h-1.5 rounded-full bg-indigo-500" />
+                          {tx.category_name}
+                        </span>
+                      ) : (
+                        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-medium text-amber-700 bg-amber-50 border border-amber-200/50">
+                          Uncategorized
+                        </span>
+                      )}
+                    </td>
                     <td className="py-3 px-4 text-slate-600 whitespace-nowrap">{tx.account_name || 'Account'}</td>
                     <td className="py-3 px-4 whitespace-nowrap">
                       <span className={`px-2 py-0.5 rounded-full text-[10px] font-medium ${
@@ -395,15 +466,77 @@ export function Expenses() {
           </div>
 
           <div>
-            <label className="block text-xs font-medium text-slate-700 mb-1">Category</label>
+            <div className="flex items-center justify-between mb-1">
+              <label className="block text-xs font-medium text-slate-700">Category</label>
+              <button
+                type="button"
+                onClick={() => setIsCreatingCat(!isCreatingCat)}
+                className="text-[11px] text-indigo-600 hover:text-indigo-700 font-semibold inline-flex items-center gap-0.5"
+              >
+                <Plus className="w-3 h-3" />
+                {isCreatingCat ? 'Cancel' : 'New Category'}
+              </button>
+            </div>
+
+            {isCreatingCat && (
+              <div className="mb-2 p-2.5 bg-slate-50 border border-slate-200 rounded-lg space-y-2">
+                <input
+                  type="text"
+                  placeholder="New category name (e.g. Camera Gear, Sound Design)"
+                  value={newCatName}
+                  onChange={(e) => setNewCatName(e.target.value)}
+                  className="w-full px-2.5 py-1.5 rounded border border-slate-300 text-xs bg-white"
+                />
+                <div className="flex items-center justify-between">
+                  <label className="flex items-center gap-1.5 text-[11px] text-slate-600 cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={newCatDeductible}
+                      onChange={(e) => setNewCatDeductible(e.target.checked)}
+                      className="rounded text-indigo-600 focus:ring-indigo-500 h-3 w-3"
+                    />
+                    Tax-deductible write-off
+                  </label>
+                  <button
+                    type="button"
+                    disabled={!newCatName.trim() || createCategoryMutation.isLoading}
+                    onClick={() => {
+                      if (newCatName.trim()) {
+                        createCategoryMutation.mutate({
+                          name: newCatName.trim(),
+                          type: 'EXPENSE',
+                          is_tax_deductible: newCatDeductible,
+                          color: '#6366f1',
+                          icon: 'Tag'
+                        });
+                      }
+                    }}
+                    className="px-2.5 py-1 rounded bg-indigo-600 text-white text-[11px] font-medium hover:bg-indigo-700 disabled:opacity-50"
+                  >
+                    Save Category
+                  </button>
+                </div>
+              </div>
+            )}
+
             <select
               value={form.category_id}
-              onChange={(e) => setForm({ ...form, category_id: e.target.value })}
+              onChange={(e) => {
+                const catId = e.target.value;
+                const cat = expenseCategories.find(c => c.id === catId);
+                setForm(prev => ({
+                  ...prev,
+                  category_id: catId,
+                  is_tax_deductible: cat ? cat.is_tax_deductible : prev.is_tax_deductible
+                }));
+              }}
               className="w-full px-3 py-2 rounded-lg border border-slate-200"
             >
-              <option value="">Default Expense</option>
+              <option value="">-- Select Category (or leave Uncategorized) --</option>
               {expenseCategories.map((c) => (
-                <option key={c.id} value={c.id}>{c.name}</option>
+                <option key={c.id} value={c.id}>
+                  {c.name} {c.is_tax_deductible ? '✓ Deductible' : ''}
+                </option>
               ))}
             </select>
           </div>
@@ -573,12 +706,22 @@ export function Expenses() {
             <label className="block text-xs font-medium text-slate-700 mb-1">Category</label>
             <select
               value={editForm.category_id}
-              onChange={(e) => setEditForm({ ...editForm, category_id: e.target.value })}
+              onChange={(e) => {
+                const catId = e.target.value;
+                const cat = expenseCategories.find(c => c.id === catId);
+                setEditForm(prev => ({
+                  ...prev,
+                  category_id: catId,
+                  is_tax_deductible: cat ? cat.is_tax_deductible : prev.is_tax_deductible
+                }));
+              }}
               className="w-full px-3 py-2 rounded-lg border border-slate-200"
             >
-              <option value="">Default Expense</option>
+              <option value="">-- Select Category (or leave Uncategorized) --</option>
               {expenseCategories.map((c) => (
-                <option key={c.id} value={c.id}>{c.name}</option>
+                <option key={c.id} value={c.id}>
+                  {c.name} {c.is_tax_deductible ? '✓ Deductible' : ''}
+                </option>
               ))}
             </select>
           </div>
