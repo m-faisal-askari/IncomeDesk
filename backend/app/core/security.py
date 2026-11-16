@@ -25,6 +25,13 @@ security = HTTPBearer(auto_error=False)
 _ASYMMETRIC_ALGORITHMS = {"ES256", "RS256", "EdDSA"}
 logger = logging.getLogger(__name__)
 
+# This public demo credential is deliberately limited to one fixed sample user.
+# It must never resolve to a real authenticated account.
+DEMO_ACCESS_TOKEN = "incomedesk-public-demo"
+DEMO_USER_ID = "incomedesk-public-demo"
+DEMO_EMAIL = "alex.morgan@example.com"
+DEMO_NAME = "Alex Morgan"
+
 
 @lru_cache(maxsize=4)
 def _jwk_client(jwks_url: str) -> jwt.PyJWKClient:
@@ -271,6 +278,22 @@ def get_current_user_claims(
             detail="No access token was sent to the API. Please sign in again.",
             headers={"WWW-Authenticate": "Bearer"},
         )
+
+    if credentials.credentials == DEMO_ACCESS_TOKEN:
+        from backend.app.seed import ensure_demo_data
+
+        ensure_demo_data(db)
+        return {
+            "sub": DEMO_USER_ID,
+            "user_id": DEMO_USER_ID,
+            "email": DEMO_EMAIL,
+            "name": DEMO_NAME,
+            "full_name": DEMO_NAME,
+            "is_guest": False,
+            "is_demo": True,
+            "auth_provider": "demo",
+            "role": "authenticated",
+        }
 
     payload = verify_token(credentials.credentials)
 

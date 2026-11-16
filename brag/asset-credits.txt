@@ -1,0 +1,6 @@
+Music: “Happy Beats / Business Moves” Vol. 12 by Sascha Ende, ende.app (CC BY 4.0).
+Source: https://ende.app/en
+License: https://ende.app/en/standard-license
+
+Interface sound effects are from Kenney's CC0 audio library.
+The composition includes the GSAP 3.15.0 runtime bundled with the local HyperFrames installation.

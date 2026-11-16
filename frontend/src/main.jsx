@@ -51,19 +51,19 @@ function ToastBridge({ children }) {
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
     <QueryClientProvider client={queryClient}>
-      <AuthProvider>
-        <ThemeProvider>
-          <CurrencyProvider>
-            <ToastProvider>
-              <ToastBridge>
-                <BrowserRouter>
+      <BrowserRouter>
+        <AuthProvider>
+          <ThemeProvider>
+            <CurrencyProvider>
+              <ToastProvider>
+                <ToastBridge>
                   <App />
-                </BrowserRouter>
-              </ToastBridge>
-            </ToastProvider>
-          </CurrencyProvider>
-        </ThemeProvider>
-      </AuthProvider>
+                </ToastBridge>
+              </ToastProvider>
+            </CurrencyProvider>
+          </ThemeProvider>
+        </AuthProvider>
+      </BrowserRouter>
     </QueryClientProvider>
   </React.StrictMode>
 );

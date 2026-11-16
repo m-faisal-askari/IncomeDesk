@@ -15,6 +15,7 @@ import { Badge } from '../components/Badge';
 import { formatCurrency, formatDate } from '../utils/formatters';
 import { useCurrency } from '../contexts/CurrencyContext';
 import { Link } from 'react-router-dom';
+import { appPath } from '../utils/appPath';
 
 const CATEGORY_COLORS = [
   'var(--chart-category-1)',
@@ -256,7 +257,7 @@ export function Dashboard() {
                   : 'No clients owe you money right now.'}
             </p>
           </div>
-          <Link to="/invoices" className="text-xs text-slate-400 hover:text-slate-900 transition font-medium">View invoices &rarr;</Link>
+          <Link to={appPath('/invoices')} className="text-xs text-slate-400 hover:text-slate-900 transition font-medium">View invoices &rarr;</Link>
         </div>
 
         {loadingReceivables ? (
@@ -293,7 +294,7 @@ export function Dashboard() {
                   : 'No active loans recorded.'}
             </p>
           </div>
-          <Link to="/loans" className="text-xs text-slate-400 hover:text-slate-900 transition font-medium">Manage loans &rarr;</Link>
+          <Link to={appPath('/loans')} className="text-xs text-slate-400 hover:text-slate-900 transition font-medium">Manage loans &rarr;</Link>
         </div>
 
         {loadingLoans ? (
@@ -428,7 +429,7 @@ export function Dashboard() {
               <h3 className="font-semibold text-slate-900 text-sm">Upcoming Obligations</h3>
               <p className="text-xs text-slate-500">Invoices due and subscription renewals</p>
             </div>
-            <Link to="/invoices" className="text-xs text-slate-400 hover:text-slate-900 transition font-medium">View All &rarr;</Link>
+            <Link to={appPath('/invoices')} className="text-xs text-slate-400 hover:text-slate-900 transition font-medium">View All &rarr;</Link>
           </div>
 
           {loadingUpcoming ? <ListSkeleton label="Loading upcoming obligations" /> : (
@@ -454,11 +455,11 @@ export function Dashboard() {
               <div key={sub.id} className="flex items-center justify-between p-2.5 rounded-lg bg-slate-50 border border-slate-100 text-xs">
                 <div>
                   <p className="font-semibold text-slate-800">{sub.name}</p>
-                  <p className="text-slate-500">{sub.vendor || 'Subscription'} • Renews {formatDate(sub.renewal_date)}</p>
+                  <p className="text-slate-500">{sub.vendor || 'Subscription'} • Renews {formatDate(sub.renewal_date || sub.next_date)}</p>
                 </div>
                 <div className="text-right">
                   <p className="font-bold text-rose-500">{formatCurrency(sub.amount, sub.currency)}</p>
-                  <span className="text-[10px] text-slate-400 uppercase font-semibold">{sub.billing_frequency}</span>
+                  <span className="text-[10px] text-slate-400 uppercase font-semibold">{sub.billing_frequency || sub.frequency}</span>
                 </div>
               </div>
             ))}
@@ -473,7 +474,7 @@ export function Dashboard() {
               <h3 className="font-semibold text-slate-900 text-sm">Recent Activity</h3>
               <p className="text-xs text-slate-500">Latest confirmed transactions</p>
             </div>
-            <Link to="/transactions" className="text-xs text-slate-400 hover:text-slate-900 transition font-medium">Full Ledger &rarr;</Link>
+            <Link to={appPath('/transactions')} className="text-xs text-slate-400 hover:text-slate-900 transition font-medium">Full Ledger &rarr;</Link>
           </div>
 
           {loadingRecentTxs ? <ListSkeleton rows={4} label="Loading recent transactions" /> : (

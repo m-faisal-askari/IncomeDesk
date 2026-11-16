@@ -215,6 +215,9 @@ export function LandingPage() {
             <Link to="/pricing" className="text-slate-600 transition hover:text-slate-900 dark:text-slate-400 dark:hover:text-white">
               Pricing <span className="ml-1 rounded border border-emerald-500/30 bg-emerald-500/10 px-1 py-0.2 font-mono text-[9px] text-emerald-700 dark:text-emerald-400">$10/mo</span>
             </Link>
+            <Link to="/demo" className="text-slate-600 transition hover:text-slate-900 dark:text-slate-400 dark:hover:text-white">
+              Live demo
+            </Link>
           </nav>
 
           <div className="flex items-center gap-3">
@@ -262,6 +265,12 @@ export function LandingPage() {
                 className="inline-flex w-full items-center justify-center gap-2 rounded-lg border border-slate-300 bg-white px-5 py-3.5 text-xs font-semibold text-slate-700 transition hover:bg-slate-50 dark:border-white/10 dark:bg-white/5 dark:text-slate-300 dark:hover:bg-white/10 sm:w-auto"
               >
                 View Pricing ($10/mo after beta)
+              </Link>
+              <Link
+                to="/demo"
+                className="inline-flex w-full items-center justify-center gap-2 rounded-lg border border-emerald-700/20 bg-emerald-50 px-5 py-3.5 text-xs font-semibold text-emerald-800 transition hover:bg-emerald-100 dark:border-emerald-400/20 dark:bg-emerald-400/10 dark:text-emerald-300 dark:hover:bg-emerald-400/15 sm:w-auto"
+              >
+                Explore live demo
               </Link>
             </div>
 

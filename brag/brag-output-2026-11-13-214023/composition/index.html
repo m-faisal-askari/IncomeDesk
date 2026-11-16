@@ -1,0 +1,481 @@
+<!doctype html>
+<html lang="en" data-resolution="portrait">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=1080, height=1920" />
+    <title>IncomeDesk — Money in focus</title>
+    <script src="assets/vendor/gsap.min.js"></script>
+    <script src="assets/music/audio-envelope.js"></script>
+    <style>
+      :root {
+        --ground: #000000;
+        --surface: #0e0e11;
+        --surface-raised: #1e1e24;
+        --border: #26262d;
+        --ink: #ffffff;
+        --ink-secondary: #d1d5db;
+        --ink-muted: #9ca3af;
+        --brand: #08764a;
+        --green: #35c98a;
+        --red: #f87171;
+        --font-display: "Inter", Arial, sans-serif;
+      }
+
+      *, *::before, *::after { box-sizing: border-box; }
+      html, body {
+        margin: 0;
+        width: 1080px;
+        height: 1920px;
+        overflow: hidden;
+        background: var(--ground);
+        color: var(--ink);
+        font-family: var(--font-display);
+        font-variant-numeric: tabular-nums;
+      }
+      body { -webkit-font-smoothing: antialiased; }
+      #main {
+        position: relative;
+        width: 1080px;
+        height: 1920px;
+        overflow: hidden;
+        background: var(--ground);
+      }
+      .scene {
+        position: absolute;
+        inset: 0;
+        overflow: hidden;
+        background: var(--ground);
+      }
+      #scene-1 { z-index: 1; }
+      #scene-2 { z-index: 2; transform: translateX(100%); }
+      #scene-3 { z-index: 3; transform: translateY(100%); }
+      #scene-4 { z-index: 4; transform: translateY(100%); }
+      .ambient-glow {
+        position: absolute;
+        z-index: 0;
+        inset: -80px;
+        pointer-events: none;
+        opacity: .15;
+        background: radial-gradient(ellipse 760px 720px at 50% 16%, rgba(8, 118, 74, .2), transparent 76%);
+      }
+      #scene-2 .ambient-glow { background: radial-gradient(ellipse 760px 650px at 72% 14%, rgba(8, 118, 74, .2), transparent 76%); }
+      #scene-3 .ambient-glow { background: radial-gradient(ellipse 780px 760px at 18% 84%, rgba(8, 118, 74, .18), transparent 76%); }
+      #scene-4 .ambient-glow { background: radial-gradient(ellipse 760px 700px at 50% 48%, rgba(8, 118, 74, .22), transparent 76%); }
+
+      .scene-content {
+        position: relative;
+        z-index: 1;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        width: 100%;
+        height: 100%;
+        padding: 112px 72px 94px;
+        gap: 30px;
+      }
+      .top-row, .eyebrow-row, .invoice-top, .metric-row, .card-foot, .brand-lockup, .section-row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+      }
+      .brand-word {
+        color: var(--ink);
+        font-size: 32px;
+        font-weight: 650;
+        letter-spacing: -.04em;
+      }
+      .brand-word span { color: var(--green); }
+      .demo-chip, .status-chip, .eyebrow, .small-label, .step-tag {
+        font-size: 28px;
+        line-height: 1.2;
+        font-weight: 700;
+        letter-spacing: .12em;
+      }
+      .demo-chip {
+        padding: 12px 16px;
+        border: 1px solid rgba(53, 201, 138, .45);
+        border-radius: 999px;
+        color: var(--green);
+        background: rgba(8, 118, 74, .17);
+      }
+      .intro-copy { max-width: 900px; }
+      .eyebrow { margin: 0 0 25px; color: var(--green); }
+      h1, h2, p { margin-top: 0; }
+      h1 {
+        max-width: 900px;
+        margin-bottom: 24px;
+        font-size: 96px;
+        line-height: 1.02;
+        font-weight: 720;
+        letter-spacing: -.065em;
+      }
+      h1 .accent, h2 .accent { color: var(--green); }
+      .lede {
+        max-width: 760px;
+        margin-bottom: 0;
+        color: var(--ink-secondary);
+        font-size: 31px;
+        line-height: 1.35;
+        letter-spacing: -.02em;
+      }
+      .invoice-card, .settlement-card, .metric-card, .reserve-card {
+        border: 1px solid var(--border);
+        border-radius: 34px;
+        background: rgba(14, 14, 17, .96);
+        box-shadow: 0 30px 90px rgba(0, 0, 0, .42);
+      }
+      .invoice-card {
+        padding: 36px 36px 32px;
+      }
+      .activity-list { margin-top: 26px; }
+      .activity-row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 18px;
+        padding: 18px 0;
+        border-top: 1px solid var(--border);
+      }
+      .activity-description { display: flex; flex-direction: column; gap: 6px; }
+      .activity-description .small-label { font-size: 28px; letter-spacing: .08em; }
+      .activity-description strong { font-size: 30px; line-height: 1.1; font-weight: 600; }
+      .activity-amount { white-space: nowrap; font-size: 34px; line-height: 1; font-weight: 680; letter-spacing: -.04em; }
+      .activity-amount.positive { color: var(--green); }
+      .activity-amount.negative { color: #ff9696; }
+      .activity-card .card-foot { margin-top: 20px; }
+      .small-label { color: var(--ink-muted); }
+      .status-chip {
+        padding: 11px 15px;
+        border-radius: 999px;
+        color: #fbbf24;
+        background: rgba(245, 158, 11, .13);
+        border: 1px solid rgba(245, 158, 11, .3);
+      }
+      .invoice-amount {
+        margin: 36px 0 28px;
+        font-size: 78px;
+        line-height: 1;
+        font-weight: 650;
+        letter-spacing: -.06em;
+      }
+      .invoice-amount small { color: var(--ink-muted); font-size: 44px; }
+      .rule { height: 1px; margin: 0 0 24px; background: var(--border); }
+      .invoice-meta { color: var(--ink-muted); font-size: 28px; }
+      .invoice-meta strong { color: var(--ink); font-size: 30px; font-weight: 600; }
+      .card-foot { margin-top: 28px; color: var(--ink-muted); font-size: 28px; font-weight: 650; letter-spacing: .06em; }
+      .dot { width: 10px; height: 10px; margin-right: 10px; display: inline-block; border-radius: 50%; background: var(--green); }
+      .bottom-note { color: #70757e; font-size: 28px; line-height: 1.2; letter-spacing: .06em; font-weight: 600; }
+
+      .scene-heading { max-width: 850px; }
+      h2 {
+        margin: 0 0 20px;
+        font-size: 74px;
+        line-height: 1.04;
+        font-weight: 700;
+        letter-spacing: -.06em;
+      }
+      .scene-heading .lede { font-size: 28px; }
+      .settlement-card { padding: 30px; }
+      .invoice-mini {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 20px;
+        padding: 26px 26px 28px;
+        border-radius: 25px;
+        background: #111115;
+      }
+      .invoice-mini p { margin: 0; }
+      .invoice-mini .small-label { margin-bottom: 12px; }
+      .invoice-mini strong { font-size: 36px; letter-spacing: -.04em; }
+      .mini-side { position: relative; width: 190px; height: 56px; text-align: right; }
+      .mini-side .status-chip, .mini-side .paid-chip { position: absolute; top: 0; right: 0; margin: 0; }
+      #s2-paid { opacity: 0; }
+      .paid-chip {
+        display: inline-block;
+        margin-bottom: 9px;
+        padding: 8px 12px;
+        border: 1px solid rgba(53, 201, 138, .35);
+        border-radius: 999px;
+        color: var(--green);
+        background: rgba(8, 118, 74, .18);
+        font-size: 28px;
+        font-weight: 700;
+        letter-spacing: .1em;
+      }
+      .record-button {
+        position: relative;
+        display: grid;
+        place-items: center;
+        width: 100%;
+        margin-top: 24px;
+        min-height: 76px;
+        padding: 25px 28px;
+        border: 0;
+        border-radius: 22px;
+        color: white;
+        background: var(--brand);
+        font: inherit;
+        font-size: 30px;
+        font-weight: 700;
+        text-align: center;
+      }
+      #s2-button-confirmed { position: absolute; inset: 0; display: grid; place-items: center; opacity: 0; }
+      .confirmation {
+        display: flex;
+        align-items: center;
+        gap: 18px;
+        margin-top: 24px;
+        padding: 24px 26px;
+        border: 1px solid rgba(53, 201, 138, .28);
+        border-radius: 24px;
+        color: var(--ink);
+        background: rgba(8, 118, 74, .14);
+        font-size: 32px;
+        font-weight: 650;
+      }
+      .check-mark {
+        display: grid;
+        place-items: center;
+        flex: 0 0 42px;
+        width: 42px;
+        height: 42px;
+        border-radius: 50%;
+        color: #001b10;
+        background: var(--green);
+        font-size: 32px;
+        font-weight: 800;
+      }
+      .income-entry {
+        margin-top: 24px;
+        padding: 28px 26px;
+        border: 1px solid var(--border);
+        border-radius: 24px;
+        background: #111115;
+      }
+      .income-entry .small-label { margin-bottom: 10px; color: var(--green); }
+      .income-entry .section-row { align-items: baseline; gap: 20px; }
+      .income-entry .section-row span { color: var(--ink-secondary); font-size: 28px; }
+      .income-entry strong { color: var(--green); font-size: 44px; letter-spacing: -.045em; }
+      .income-entry strong.negative-value { color: #ff9696; }
+
+      .metrics-shell { padding: 32px; border: 1px solid var(--border); border-radius: 36px; background: rgba(14, 14, 17, .94); }
+      .metrics-shell .small-label { margin-bottom: 22px; }
+      .metric-card {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 20px;
+        min-height: 138px;
+        margin-top: 17px;
+        padding: 24px 25px;
+        border-radius: 24px;
+        background: #111115;
+      }
+      .metric-card .metric-label { max-width: 470px; color: var(--ink-secondary); font-size: 28px; line-height: 1.2; font-weight: 550; }
+      .metric-card strong { color: var(--ink); white-space: nowrap; font-size: 40px; line-height: 1; font-weight: 680; letter-spacing: -.045em; }
+      .metric-card.net { border-color: rgba(53, 201, 138, .38); background: rgba(8, 118, 74, .13); }
+      .metric-card.net .metric-label { color: var(--ink); }
+      .metric-card.net strong { color: var(--green); font-size: 46px; }
+      .metrics-foot { display: flex; justify-content: space-between; align-items: center; margin-top: 25px; color: var(--ink-muted); font-size: 28px; line-height: 1.2; }
+      .metrics-foot strong { color: var(--green); font-weight: 650; }
+
+      .reserve-card { padding: 38px; }
+      .reserve-card .small-label { margin-bottom: 25px; color: var(--green); }
+      .reserve-amount { margin: 0 0 26px; font-size: 100px; line-height: 1; font-weight: 700; letter-spacing: -.07em; }
+      .reserve-amount small { color: var(--ink-muted); font-size: 46px; }
+      .reserve-meta { display: flex; flex-direction: column; gap: 13px; color: var(--ink-secondary); font-size: 28px; }
+      .reserve-meta strong { color: var(--ink); font-weight: 650; }
+      .disclaimer { margin: 28px 0 0; padding-top: 24px; border-top: 1px solid var(--border); color: var(--ink-muted); font-size: 28px; line-height: 1.35; }
+      .brand-lockup { justify-content: flex-start; gap: 20px; }
+      .brand-lockup img { width: 68px; height: 68px; object-fit: contain; }
+      .brand-lockup strong { display: block; margin-bottom: 6px; font-size: 33px; font-weight: 700; letter-spacing: -.05em; }
+      .brand-lockup p { margin: 0; color: var(--ink-secondary); font-size: 28px; }
+      .s4-ending { padding-top: 24px; border-top: 1px solid rgba(255,255,255,.1); }
+      .s4-ending p { margin: 0; color: var(--ink-muted); font-size: 28px; letter-spacing: .06em; font-weight: 650; text-transform: uppercase; }
+      .highlight { color: var(--green); }
+    </style>
+  </head>
+  <body>
+    <div id="main" data-composition-id="main" data-start="0" data-duration="21" data-width="1080" data-height="1920">
+      <section id="scene-1" class="scene clip" data-start="0" data-duration="5.0" data-track-index="1" aria-label="Money came in and went out without a clear picture">
+        <div id="s1-glow" class="ambient-glow" aria-hidden="true"></div>
+        <div class="scene-content" data-layout-allow-overlap data-layout-allow-occlusion>
+          <div id="s1-top" class="top-row">
+            <div class="brand-word">Income<span>Desk</span></div>
+            <div class="demo-chip">DEMO DATA</div>
+          </div>
+          <div id="s1-copy" class="intro-copy">
+            <p class="eyebrow">THE FREELANCER MONEY MYSTERY</p>
+            <h1>Money came in.<br><span class="accent">Money went out.</span></h1>
+            <p class="lede">No idea where it went?</p>
+          </div>
+          <div id="s1-invoice" class="invoice-card activity-card">
+            <div class="invoice-top">
+              <span class="small-label">RECENT ACTIVITY · SAMPLE</span>
+              <span class="status-chip">NO TOTAL</span>
+            </div>
+            <div class="activity-list">
+              <div id="s1-row-1" class="activity-row"><div class="activity-description"><span class="small-label">FEB 02 · CLIENT</span><strong>Project payment</strong></div><strong class="activity-amount positive">+$6,200</strong></div>
+              <div id="s1-row-2" class="activity-row"><div class="activity-description"><span class="small-label">FEB 03 · STUDIO</span><strong>Workspace rent</strong></div><strong class="activity-amount negative">−$1,150</strong></div>
+              <div id="s1-row-3" class="activity-row"><div class="activity-description"><span class="small-label">FEB 05 · BUSINESS</span><strong>Tools and software</strong></div><strong class="activity-amount negative">−$980</strong></div>
+              <div id="s1-row-4" class="activity-row"><div class="activity-description"><span class="small-label">FEB 08 · PROJECT</span><strong>Project expenses</strong></div><strong class="activity-amount negative">−$730</strong></div>
+            </div>
+            <div class="card-foot"><span><i class="dot"></i>Money in. Money out.</span><span>USD</span></div>
+          </div>
+          <p id="s1-foot" class="bottom-note">ACTIVITY EVERYWHERE · NO MONTHLY PICTURE</p>
+        </div>
+      </section>
+
+      <section id="scene-2" class="scene clip" data-start="4.4" data-duration="5.3" data-track-index="2" aria-label="IncomeDesk brings income and expenses into one view">
+        <div id="s2-glow" class="ambient-glow" aria-hidden="true"></div>
+        <div class="scene-content" data-layout-allow-overlap data-layout-allow-occlusion>
+          <div id="s2-top" class="top-row">
+            <div class="brand-word">Income<span>Desk</span></div>
+            <div class="demo-chip">DEMO DATA</div>
+          </div>
+          <div id="s2-heading" class="scene-heading">
+            <p class="eyebrow">MEET INCOMEDESK</p>
+            <h2>Bring it <span class="accent">into focus.</span></h2>
+            <p class="lede">Freelance income and expenses, together in one clear view.</p>
+          </div>
+          <div id="s2-flow" class="settlement-card">
+            <div id="s2-income" class="invoice-mini">
+              <div>
+                <p class="small-label">CONFIRMED INCOME · USD</p>
+                <strong>+$6,200</strong>
+              </div>
+              <span class="paid-chip">RECORDED</span>
+            </div>
+            <div id="s2-expenses" class="income-entry">
+              <p class="small-label">TRACKED EXPENSES</p>
+              <div class="section-row"><span>Tools, projects, and operating costs</span><strong class="negative-value">−$2,860</strong></div>
+            </div>
+            <div id="s2-together" class="confirmation"><span class="check-mark">✓</span><span>Income and expenses, together</span></div>
+          </div>
+          <p id="s2-foot" class="bottom-note">ONE CLEAR VIEW FOR FREELANCER FINANCES</p>
+        </div>
+      </section>
+
+      <section id="scene-3" class="scene clip" data-start="8.74" data-duration="5.96" data-track-index="3" aria-label="IncomeDesk Financial Overview with sample monthly cash flow">
+        <div id="s3-glow" class="ambient-glow" aria-hidden="true"></div>
+        <div class="scene-content" data-layout-allow-overlap data-layout-allow-occlusion>
+          <div id="s3-top" class="top-row">
+            <div class="brand-word">Income<span>Desk</span></div>
+            <div class="demo-chip">DEMO DATA</div>
+          </div>
+          <div id="s3-heading" class="scene-heading">
+            <p class="eyebrow">YOUR FREELANCE BUSINESS</p>
+            <h2>Financial <span class="accent">Overview</span></h2>
+            <p class="lede">See what came in, what went out, and what's left.</p>
+          </div>
+          <div id="s3-metrics" class="metrics-shell">
+            <p class="small-label">THIS MONTH · USD</p>
+            <div id="s3-metric-1" class="metric-card"><span class="metric-label">Net Cash Received</span><strong>$6,200</strong></div>
+            <div id="s3-metric-2" class="metric-card"><span class="metric-label">Total Expenses</span><strong>$2,860</strong></div>
+            <div id="s3-metric-3" class="metric-card net"><span class="metric-label">Net Cash Flow</span><strong>$3,340</strong></div>
+            <div id="s3-foot" class="metrics-foot"><span>Received inflows minus outflows</span><strong>+$3,340</strong></div>
+          </div>
+          <p class="bottom-note">SAMPLE VALUES · USD</p>
+        </div>
+      </section>
+
+      <section id="scene-4" class="scene clip" data-start="14.7" data-duration="6.3" data-track-index="4" aria-label="Estimated tax reserve and IncomeDesk brand">
+        <div id="s4-glow" class="ambient-glow" aria-hidden="true"></div>
+        <div class="scene-content" data-layout-allow-overlap data-layout-allow-occlusion>
+          <div id="s4-top" class="top-row">
+            <div class="brand-word">Income<span>Desk</span></div>
+            <div class="demo-chip">DEMO DATA</div>
+          </div>
+          <div id="s4-heading" class="scene-heading">
+            <p class="eyebrow">TAX PLANNING</p>
+            <h2>Know what to <span class="accent">reserve.</span></h2>
+            <p class="lede">Keep an estimated tax target beside the money you earn.</p>
+          </div>
+          <div id="s4-reserve" class="reserve-card">
+            <p class="small-label">ESTIMATED TAX RESERVE</p>
+            <p id="s4-amount" class="reserve-amount">$668<small>.00</small></p>
+            <div class="reserve-meta">
+              <span>Demo target <strong>20%</strong></span>
+              <span>Sample profit <strong>$3,340.00</strong></span>
+            </div>
+            <p class="disclaimer"><strong>Planning Estimates Only.</strong> A sample reserve target based on demo figures and a configured rate.</p>
+          </div>
+          <div id="s4-brand" class="brand-lockup">
+            <img src="assets/brand/incomedesk-icon.svg" alt="" />
+            <div><strong>IncomeDesk</strong><p>Financial workspace for freelancers.</p></div>
+          </div>
+          <div id="s4-ending" class="s4-ending"><p>Income · expenses · cash flow · tax reserve</p></div>
+        </div>
+      </section>
+
+      <audio id="bg-music" data-start="0" data-duration="21" data-track-index="10" data-volume="0.30" data-fade-in="0.35" data-fade-out="1.0" src="assets/music/happy-beats-business-moves-vol-12-by-ende-dot-app.mp3"></audio>
+      <audio id="sfx-activity-entry" data-start="1.2" data-duration="0.01" data-track-index="11" data-volume="0.5" src="assets/sfx/interface/click_003.ogg"></audio>
+      <audio id="sfx-incomedesk-reveal" data-start="4.4" data-duration="0.183" data-track-index="12" data-volume="0.56" src="assets/sfx/impact/impactSoft_medium_001.ogg"></audio>
+      <audio id="sfx-flow-clear" data-start="12.0" data-duration="0.183" data-track-index="13" data-volume="0.48" src="assets/sfx/impact/impactSoft_medium_001.ogg"></audio>
+      <audio id="sfx-reserve-reveal" data-start="17.47" data-duration="0.123" data-track-index="13" data-volume="0.58" src="assets/sfx/interface/bong_001.ogg"></audio>
+    </div>
+
+    <script>
+      window.__timelines = window.__timelines || {};
+      const tl = gsap.timeline({ paused: true });
+
+      // Open on the freelancer's unexplained activity list; rows appear quickly, then stay readable.
+      tl.fromTo("#s1-copy", { y: 18, opacity: 0 }, { y: 0, opacity: 1, duration: 0.42, ease: "power3.out" }, 0.12);
+      tl.fromTo("#s1-invoice", { y: 34, opacity: 0, scale: 0.985 }, { y: 0, opacity: 1, scale: 1, duration: 0.5, ease: "power3.out" }, 0.82);
+      tl.fromTo("#s1-row-1", { x: -18, opacity: 0 }, { x: 0, opacity: 1, duration: 0.32, ease: "power3.out" }, 1.26);
+      tl.fromTo("#s1-row-2", { x: 18, opacity: 0 }, { x: 0, opacity: 1, duration: 0.32, ease: "power3.out" }, 1.58);
+      tl.fromTo("#s1-row-3", { x: -18, opacity: 0 }, { x: 0, opacity: 1, duration: 0.32, ease: "power3.out" }, 1.90);
+      tl.fromTo("#s1-row-4", { x: 18, opacity: 0 }, { x: 0, opacity: 1, duration: 0.32, ease: "power3.out" }, 2.22);
+      tl.fromTo("#s1-foot", { opacity: 0 }, { opacity: 1, duration: 0.36, ease: "power2.out" }, 2.42);
+
+      // IncomeDesk replaces the loose transactions with a coherent monthly picture.
+      tl.fromTo("#scene-2", { x: 1080 }, { x: 0, duration: 0.66, ease: "power3.inOut" }, 4.4);
+      tl.fromTo("#s2-top", { y: -18, opacity: 0 }, { y: 0, opacity: 1, duration: 0.36, ease: "power4.out" }, 4.88);
+      tl.fromTo("#s2-heading", { x: 24, opacity: 0 }, { x: 0, opacity: 1, duration: 0.48, ease: "expo.out" }, 4.96);
+      tl.fromTo("#s2-flow", { y: 24, opacity: 0 }, { y: 0, opacity: 1, duration: 0.5, ease: "power3.out" }, 5.34);
+      tl.fromTo("#s2-income", { y: 18, opacity: 0 }, { y: 0, opacity: 1, duration: 0.4, ease: "expo.out" }, 5.88);
+      tl.fromTo("#s2-expenses", { y: 18, opacity: 0 }, { y: 0, opacity: 1, duration: 0.4, ease: "expo.out" }, 6.74);
+      tl.fromTo("#s2-together", { y: 14, opacity: 0 }, { y: 0, opacity: 1, duration: 0.38, ease: "power3.out" }, 7.56);
+      tl.fromTo("#s2-foot", { opacity: 0 }, { opacity: 1, duration: 0.34, ease: "power2.out" }, 7.68);
+      // beat-locked: 8.74s — the complete monthly picture gives way to the financial overview.
+      tl.fromTo("#s2-flow", { scale: 1 }, { scale: 1.012, duration: 0.18, ease: "power1.out" }, 8.74);
+      tl.to("#s2-flow", { scale: 1, duration: 0.2, ease: "power2.out" }, 8.92);
+
+      // The dashboard resolves the month into a legible net cash-flow result.
+      tl.fromTo("#scene-3", { y: 1920 }, { y: 0, duration: 0.68, ease: "power3.inOut" }, 8.74);
+      tl.fromTo("#s3-heading", { y: 22, opacity: 0 }, { y: 0, opacity: 1, duration: 0.48, ease: "expo.out" }, 9.2);
+      tl.fromTo("#s3-metrics", { y: 22, opacity: 0 }, { y: 0, opacity: 1, duration: 0.42, ease: "power3.out" }, 9.4);
+      // beat-grid: dashboard rows arrive at readable intervals and remain together on screen.
+      tl.fromTo("#s3-metric-1", { y: 22, opacity: 0 }, { y: 0, opacity: 1, duration: 0.42, ease: "expo.out" }, 9.72);
+      tl.fromTo("#s3-metric-2", { x: 22, opacity: 0 }, { x: 0, opacity: 1, duration: 0.42, ease: "power4.out" }, 10.72);
+      tl.fromTo("#s3-metric-3", { y: 20, opacity: 0, scale: 0.99 }, { y: 0, opacity: 1, scale: 1, duration: 0.44, ease: "back.out(1.04)" }, 11.72);
+      tl.fromTo("#s3-foot", { opacity: 0 }, { opacity: 1, duration: 0.32, ease: "power2.out" }, 12.38);
+
+      // The sample net flow becomes a clearly labeled tax-planning estimate.
+      tl.fromTo("#scene-4", { y: 1920 }, { y: 0, duration: 0.66, ease: "power3.inOut" }, 14.7);
+      tl.fromTo("#s4-top", { y: -16, opacity: 0 }, { y: 0, opacity: 1, duration: 0.34, ease: "power4.out" }, 15.04);
+      tl.fromTo("#s4-heading", { x: 22, opacity: 0 }, { x: 0, opacity: 1, duration: 0.48, ease: "expo.out" }, 15.1);
+      tl.fromTo("#s4-reserve", { y: 20, opacity: 0 }, { y: 0, opacity: 1, duration: 0.48, ease: "power3.out" }, 15.54);
+      // beat-locked: 17.47s — reveal the estimated reserve after the rate and sample profit are visible.
+      tl.fromTo("#s4-amount", { y: 14, opacity: 0 }, { y: 0, opacity: 1, duration: 0.4, ease: "expo.out" }, 17.47);
+      tl.fromTo("#s4-brand", { y: 16, opacity: 0 }, { y: 0, opacity: 1, duration: 0.5, ease: "power4.out" }, 18.04);
+      tl.fromTo("#s4-ending", { opacity: 0 }, { opacity: 1, duration: 0.38, ease: "power2.out" }, 18.46);
+
+      // Subtle audio reactivity: the measured music envelope breathes the existing brand glow.
+      const envelope = window.__audioEnvelope || { hopMs: 33, values: [] };
+      const glowTargets = ["#s1-glow", "#s2-glow", "#s3-glow", "#s4-glow"];
+      const hopSeconds = envelope.hopMs / 1000;
+      const sampleStride = Math.max(1, Math.round(0.264 / hopSeconds));
+      for (let i = 0; i < envelope.values.length; i += sampleStride) {
+        const next = Math.min(i + sampleStride, envelope.values.length - 1);
+        const start = i * hopSeconds;
+        const duration = Math.max(hopSeconds, (next - i) * hopSeconds);
+        const opacity = 0.12 + envelope.values[next] * 0.06;
+        glowTargets.forEach((target) => tl.to(target, { opacity, duration, ease: "none" }, start));
+      }
+
+      window.__timelines.main = tl;
+    </script>
+  </body>
+</html>

@@ -1,0 +1,4 @@
+IncomeDesk icon and product name: source project assets. The short film Afterlight and all contract, revenue, cost, budget, and margin figures are fictional demo data.
+Music: Sascha Ende, ende.app (CC BY 4.0).
+Interface sound effects: Kenney (CC0).
+GSAP 3.15.0: bundled locally with Hyperframes.

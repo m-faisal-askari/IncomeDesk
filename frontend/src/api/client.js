@@ -1,8 +1,10 @@
 import { supabase } from './supabase';
 import { API_BASE_URL } from '../config/urls';
 import { reportAuthError } from '../utils/authErrorEvents';
+import { isDemoPath } from '../utils/appPath';
 
 const BASE_URL = API_BASE_URL ? `${API_BASE_URL.replace(/\/$/, '')}/api/v1` : '/api/v1';
+const DEMO_ACCESS_TOKEN = 'incomedesk-public-demo';
 
 export async function getAuthToken() {
   const { data, error } = await supabase.auth.getSession();
@@ -22,7 +24,8 @@ function refreshAuthSession() {
 }
 
 async function fetchWithAuth(url, options = {}, { jsonBody = false } = {}) {
-  const token = await getAuthToken();
+  const demoRequest = isDemoPath();
+  const token = demoRequest ? DEMO_ACCESS_TOKEN : await getAuthToken();
   const baseHeaders = new Headers(options.headers || {});
   if (jsonBody && !baseHeaders.has('Content-Type')) {
     baseHeaders.set('Content-Type', 'application/json');
@@ -40,7 +43,7 @@ async function fetchWithAuth(url, options = {}, { jsonBody = false } = {}) {
 
   let response = await sendRequest(token);
   let recoveryToken = '';
-  if (response.status === 401 && token) {
+  if (response.status === 401 && token && !demoRequest) {
     try {
       // Another request may already have refreshed the session after this
       // request was sent. Reuse that newer token before rotating again.
@@ -74,7 +77,7 @@ async function fetchWithAuth(url, options = {}, { jsonBody = false } = {}) {
     }
   }
 
-  if (response.status === 401) {
+  if (response.status === 401 && !demoRequest) {
     const message = await getResponseErrorMessage(
       response,
       token
@@ -85,7 +88,7 @@ async function fetchWithAuth(url, options = {}, { jsonBody = false } = {}) {
     // A 401 after refresh means the backend explicitly rejected the token.
     // Temporary verifier failures now use 503 and leave the session intact.
     supabase.auth.signOut({ scope: 'local' }).catch(() => {});
-  } else if (response.status === 503) {
+  } else if (response.status === 503 && !demoRequest) {
     const message = await getResponseErrorMessage(
       response,
       'The authentication service is temporarily unavailable. Your session was kept; please retry shortly.'

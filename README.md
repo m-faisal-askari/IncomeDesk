@@ -127,6 +127,8 @@ npm run dev
 ```
 Open `http://localhost:5173` in your browser.
 
+Open `http://localhost:5173/demo` to explore the sample workspace without signing in. The demo initializes its example user and four months of financial activity the first time it is opened.
+
 ---
 
 ## 5. Automated Testing

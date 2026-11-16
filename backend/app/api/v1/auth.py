@@ -108,6 +108,7 @@ def get_current_user_info(claims: dict = Depends(get_current_user_claims), db: S
         "user_id": user_id,
         "is_authenticated": True,
         "is_guest": False,
+        "is_demo": bool(claims.get("is_demo")),
         "email": email,
         "full_name": full_name,
         "base_currency": profile.base_currency if profile else settings.DEFAULT_CURRENCY,

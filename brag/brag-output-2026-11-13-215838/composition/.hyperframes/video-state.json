@@ -1,0 +1,199 @@
+{
+  "version": 1,
+  "historyId": "11bdd99e-d226-4b30-940d-98e19e93b1cc",
+  "currentRevision": null,
+  "pendingChanges": false,
+  "files": {
+    "DESIGN.md": {
+      "hash": "4e96f18407b625d403061afbc2dcd1b62faffd6f7863b74077f9f10d974e7e60",
+      "content": "C:\\Users\\IT-HOME\\.cache\\hyperframes\\history\\11bdd99e-d226-4b30-940d-98e19e93b1cc\\blobs\\4e\\4e96f18407b625d403061afbc2dcd1b62faffd6f7863b74077f9f10d974e7e60"
+    },
+    "assets/brand/incomedesk-icon.svg": {
+      "hash": "414c677a2432ceb32f8c4acfb3f3394bb6664bce72e512fee9aaf088b51aded0",
+      "content": "C:\\Users\\IT-HOME\\.cache\\hyperframes\\history\\11bdd99e-d226-4b30-940d-98e19e93b1cc\\blobs\\41\\414c677a2432ceb32f8c4acfb3f3394bb6664bce72e512fee9aaf088b51aded0"
+    },
+    "assets/music/audio-envelope.js": {
+      "hash": "5c3941138117a88c67db9922bb87d90cd038ac6824d1d7d320eb0f0825d08f38",
+      "content": "C:\\Users\\IT-HOME\\.cache\\hyperframes\\history\\11bdd99e-d226-4b30-940d-98e19e93b1cc\\blobs\\5c\\5c3941138117a88c67db9922bb87d90cd038ac6824d1d7d320eb0f0825d08f38"
+    },
+    "assets/music/audio-envelope.json": {
+      "hash": "64ee9e3ea09ad1c4355e0d8aa208e54b9151476946a1d526c7df64a141bf215b",
+      "content": "C:\\Users\\IT-HOME\\.cache\\hyperframes\\history\\11bdd99e-d226-4b30-940d-98e19e93b1cc\\blobs\\64\\64ee9e3ea09ad1c4355e0d8aa208e54b9151476946a1d526c7df64a141bf215b"
+    },
+    "assets/music/cues/happy-beats-business-moves-vol-12-by-ende-dot-app.music-cues.json": {
+      "hash": "76eea97e347e63e8037dc4fdbc08ab373bc83c10f797d1a8abd5509e73892aab",
+      "content": "C:\\Users\\IT-HOME\\.cache\\hyperframes\\history\\11bdd99e-d226-4b30-940d-98e19e93b1cc\\blobs\\76\\76eea97e347e63e8037dc4fdbc08ab373bc83c10f797d1a8abd5509e73892aab"
+    },
+    "assets/music/cues/happy-beats-business-moves-vol-12-by-ende-dot-app.music-cues.md": {
+      "hash": "9441eb1c04d3278fe7e9d9820396345d206dc5aa97828610410ff28beab28936",
+      "content": "C:\\Users\\IT-HOME\\.cache\\hyperframes\\history\\11bdd99e-d226-4b30-940d-98e19e93b1cc\\blobs\\94\\9441eb1c04d3278fe7e9d9820396345d206dc5aa97828610410ff28beab28936"
+    },
+    "assets/sfx/impact/impactSoft_medium_001.ogg": {
+      "hash": "7642a4fd43e547afe4f7adfadb3dabb681c0ff512f52c1674bae30a726841faf",
+      "content": "C:\\Users\\IT-HOME\\.cache\\hyperframes\\history\\11bdd99e-d226-4b30-940d-98e19e93b1cc\\blobs\\76\\7642a4fd43e547afe4f7adfadb3dabb681c0ff512f52c1674bae30a726841faf"
+    },
+    "assets/sfx/interface/bong_001.ogg": {
+      "hash": "d21d0f0b782445db579d11e2506b24cd1ac9d664ee33aeaf807761aa7b6fd710",
+      "content": "C:\\Users\\IT-HOME\\.cache\\hyperframes\\history\\11bdd99e-d226-4b30-940d-98e19e93b1cc\\blobs\\d2\\d21d0f0b782445db579d11e2506b24cd1ac9d664ee33aeaf807761aa7b6fd710"
+    },
+    "assets/sfx/interface/click_003.ogg": {
+      "hash": "2fa929138bc3a0f432696588f66eac94b8f6d463905ec8808c6461ce4b054292",
+      "content": "C:\\Users\\IT-HOME\\.cache\\hyperframes\\history\\11bdd99e-d226-4b30-940d-98e19e93b1cc\\blobs\\2f\\2fa929138bc3a0f432696588f66eac94b8f6d463905ec8808c6461ce4b054292"
+    },
+    "assets/sfx/sfx-analysis.md": {
+      "hash": "135606f5434a64d4dd4a5351d35ba17da1f468117dfd5f08c1aa475c1015321a",
+      "content": "C:\\Users\\IT-HOME\\.cache\\hyperframes\\history\\11bdd99e-d226-4b30-940d-98e19e93b1cc\\blobs\\13\\135606f5434a64d4dd4a5351d35ba17da1f468117dfd5f08c1aa475c1015321a"
+    },
+    "assets/vendor/gsap.min.js": {
+      "hash": "92bb9a96476f983d212a2bc4f54c889039c1696dd4461d40a736860938570fbb",
+      "content": "C:\\Users\\IT-HOME\\.cache\\hyperframes\\history\\11bdd99e-d226-4b30-940d-98e19e93b1cc\\blobs\\92\\92bb9a96476f983d212a2bc4f54c889039c1696dd4461d40a736860938570fbb"
+    },
+    "index.html": {
+      "hash": "369ab980b7bf5ce076a444ffc2ebef1faa2765f852dd45bccbaf6f278e7cc697",
+      "content": "C:\\Users\\IT-HOME\\.cache\\hyperframes\\history\\11bdd99e-d226-4b30-940d-98e19e93b1cc\\blobs\\36\\369ab980b7bf5ce076a444ffc2ebef1faa2765f852dd45bccbaf6f278e7cc697"
+    },
+    "meta.json": {
+      "hash": "66eecf4e5344881f890b13418094aca223eff1709e9f0c3d4992c45f58ea5fe4",
+      "content": "C:\\Users\\IT-HOME\\.cache\\hyperframes\\history\\11bdd99e-d226-4b30-940d-98e19e93b1cc\\blobs\\66\\66eecf4e5344881f890b13418094aca223eff1709e9f0c3d4992c45f58ea5fe4"
+    },
+    "scripts/build-audio-envelope.mjs": {
+      "hash": "d49e7a50256826477ec45e2aa3a57faa2f164b515103538c33be1974598d3ebf",
+      "content": "C:\\Users\\IT-HOME\\.cache\\hyperframes\\history\\11bdd99e-d226-4b30-940d-98e19e93b1cc\\blobs\\d4\\d49e7a50256826477ec45e2aa3a57faa2f164b515103538c33be1974598d3ebf"
+    },
+    "assets/music/happy-beats-business-moves-vol-12-by-ende-dot-app.mp3": {
+      "hash": "5888d4bd2ba0119b87a94e502ae2cc401c08192945cc5e5c2f8e8a33aa47a0a1",
+      "content": "C:\\Users\\IT-HOME\\.cache\\hyperframes\\history\\11bdd99e-d226-4b30-940d-98e19e93b1cc\\blobs\\58\\5888d4bd2ba0119b87a94e502ae2cc401c08192945cc5e5c2f8e8a33aa47a0a1"
+    }
+  },
+  "revisions": {},
+  "checks": {
+    "latest": {
+      "revision": null,
+      "id": "b5ba4cf8-5d58-456c-97c4-ee9642e9e4fb"
+    },
+    "revisions": {},
+    "unversioned": [
+      {
+        "id": "b5ba4cf8-5d58-456c-97c4-ee9642e9e4fb",
+        "scope": "project",
+        "report": "C:\\Users\\IT-HOME\\Downloads\\Projects\\Program Files\\IncomeDesk\\brag\\brag-output-2026-11-13-215838\\composition\\.hyperframes\\artifacts\\checks\\b5ba4cf8-5d58-456c-97c4-ee9642e9e4fb.json",
+        "metadata": {
+          "ok": true,
+          "browserSkipped": false,
+          "options": {
+            "samples": 9,
+            "at": [
+              2.5,
+              7.8,
+              12.8,
+              18.6
+            ],
+            "atTransitions": false,
+            "maxIssues": 80,
+            "collapseStatic": true,
+            "tolerance": 2,
+            "timeout": 3000,
+            "contrast": true,
+            "strict": false,
+            "snapshots": true,
+            "browserGpuMode": "auto"
+          }
+        },
+        "createdAt": 1794589430947,
+        "contentHash": "35ecf17063fe975c939d1f1f5ef780d0e7e0d2c3c48089f13b2c06fd850d5020",
+        "revision": null,
+        "inputFingerprint": "b546020fc44e09f6d47b3a7539cd55163cc7a0602982217e6cede022e6bcbb59",
+        "inputScope": "local-project-files",
+        "attribution": "unversioned"
+      }
+    ]
+  },
+  "snapshots": {
+    "latest": {
+      "revision": null,
+      "id": "b5ba4cf8-5d58-456c-97c4-ee9642e9e4fb-3"
+    },
+    "revisions": {},
+    "unversioned": [
+      {
+        "id": "b5ba4cf8-5d58-456c-97c4-ee9642e9e4fb-0",
+        "scope": "full",
+        "image": "C:\\Users\\IT-HOME\\Downloads\\Projects\\Program Files\\IncomeDesk\\brag\\brag-output-2026-11-13-215838\\composition\\.hyperframes\\artifacts\\snapshots\\35dd9942-63ce-4eb2-8b1d-68557d2c9371\\frame-00-at-2.5s.png",
+        "time": 2.5,
+        "metadata": {
+          "checkId": "b5ba4cf8-5d58-456c-97c4-ee9642e9e4fb",
+          "width": 1080,
+          "height": 1920
+        },
+        "createdAt": 1794589430947,
+        "contentHash": "fb34c317731e833f1020105ce5f2bfd28100be0f27788c049aaf742828f92df4",
+        "revision": null,
+        "inputFingerprint": "b546020fc44e09f6d47b3a7539cd55163cc7a0602982217e6cede022e6bcbb59",
+        "inputScope": "local-project-files",
+        "attribution": "unversioned"
+      },
+      {
+        "id": "b5ba4cf8-5d58-456c-97c4-ee9642e9e4fb-1",
+        "scope": "full",
+        "image": "C:\\Users\\IT-HOME\\Downloads\\Projects\\Program Files\\IncomeDesk\\brag\\brag-output-2026-11-13-215838\\composition\\.hyperframes\\artifacts\\snapshots\\35dd9942-63ce-4eb2-8b1d-68557d2c9371\\frame-01-at-7.8s.png",
+        "time": 7.8,
+        "metadata": {
+          "checkId": "b5ba4cf8-5d58-456c-97c4-ee9642e9e4fb",
+          "width": 1080,
+          "height": 1920
+        },
+        "createdAt": 1794589430947,
+        "contentHash": "5755887253ef50a866a64f03a2cb5c92d26a959bcf3573969fbd8cf5d9e6643a",
+        "revision": null,
+        "inputFingerprint": "b546020fc44e09f6d47b3a7539cd55163cc7a0602982217e6cede022e6bcbb59",
+        "inputScope": "local-project-files",
+        "attribution": "unversioned"
+      },
+      {
+        "id": "b5ba4cf8-5d58-456c-97c4-ee9642e9e4fb-2",
+        "scope": "full",
+        "image": "C:\\Users\\IT-HOME\\Downloads\\Projects\\Program Files\\IncomeDesk\\brag\\brag-output-2026-11-13-215838\\composition\\.hyperframes\\artifacts\\snapshots\\35dd9942-63ce-4eb2-8b1d-68557d2c9371\\frame-02-at-12.8s.png",
+        "time": 12.8,
+        "metadata": {
+          "checkId": "b5ba4cf8-5d58-456c-97c4-ee9642e9e4fb",
+          "width": 1080,
+          "height": 1920
+        },
+        "createdAt": 1794589430947,
+        "contentHash": "5da1e5293ca557bb2dfd3fd9dd090b38e40b5fc9a32f6ee20c718212c5c94463",
+        "revision": null,
+        "inputFingerprint": "b546020fc44e09f6d47b3a7539cd55163cc7a0602982217e6cede022e6bcbb59",
+        "inputScope": "local-project-files",
+        "attribution": "unversioned"
+      },
+      {
+        "id": "b5ba4cf8-5d58-456c-97c4-ee9642e9e4fb-3",
+        "scope": "full",
+        "image": "C:\\Users\\IT-HOME\\Downloads\\Projects\\Program Files\\IncomeDesk\\brag\\brag-output-2026-11-13-215838\\composition\\.hyperframes\\artifacts\\snapshots\\35dd9942-63ce-4eb2-8b1d-68557d2c9371\\frame-03-at-18.6s.png",
+        "time": 18.6,
+        "metadata": {
+          "checkId": "b5ba4cf8-5d58-456c-97c4-ee9642e9e4fb",
+          "width": 1080,
+          "height": 1920
+        },
+        "createdAt": 1794589430947,
+        "contentHash": "ee577831fffbce93f301abbec74d3406ad9b293e0c4c73742b908f1ac780bd85",
+        "revision": null,
+        "inputFingerprint": "b546020fc44e09f6d47b3a7539cd55163cc7a0602982217e6cede022e6bcbb59",
+        "inputScope": "local-project-files",
+        "attribution": "unversioned"
+      }
+    ]
+  },
+  "renders": {
+    "latest": {
+      "id": "57145838-2738-4333-85f0-34bb8af3c45b",
+      "completedAt": 1794589576977,
+      "output": "C:\\Users\\IT-HOME\\Downloads\\Projects\\Program Files\\IncomeDesk\\brag\\brag-output-2026-11-13-215838\\brag.mp4",
+      "status": "completed",
+      "revision": null
+    },
+    "retainedRevisions": []
+  },
+  "pendingArtifactCleanup": []
+}

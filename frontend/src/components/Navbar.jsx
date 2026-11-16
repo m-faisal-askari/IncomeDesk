@@ -5,6 +5,7 @@ import { useAuth } from '../contexts/AuthContext';
 import { useCurrency } from '../contexts/CurrencyContext';
 import { AuthModal } from './AuthModal';
 import { ThemeToggle } from './ThemeToggle';
+import { appPath } from '../utils/appPath';
 
 export function Navbar({ onOpenSidebar }) {
   const navigate = useNavigate();
@@ -51,7 +52,7 @@ export function Navbar({ onOpenSidebar }) {
         <div className="shrink-0 flex items-center gap-1 sm:gap-3">
           {/* Quick Actions */}
           <button
-            onClick={() => navigate('/invoices?new=1')}
+            onClick={() => navigate(appPath('/invoices?new=1', user?.is_demo))}
             className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-slate-200 text-slate-700 text-xs font-semibold hover:bg-slate-50 transition"
           >
             <Plus className="w-3.5 h-3.5" />
@@ -59,7 +60,7 @@ export function Navbar({ onOpenSidebar }) {
           </button>
 
           <button
-            onClick={() => navigate('/transactions?new=1')}
+            onClick={() => navigate(appPath('/transactions?new=1', user?.is_demo))}
             aria-label="Add transaction"
             title="Add Transaction"
             className="inline-flex items-center gap-1.5 px-2 sm:px-3 py-1.5 rounded-lg bg-indigo-600 text-white text-xs font-semibold hover:bg-indigo-700 shadow-sm transition"
@@ -73,7 +74,17 @@ export function Navbar({ onOpenSidebar }) {
           <div className="hidden sm:block h-4 w-px bg-slate-200 mx-1" />
 
           {/* User / Authentication Status */}
-          {isGuest ? (
+          {user?.is_demo ? (
+            <div className="flex items-center gap-2">
+              <span title="This sample workspace is shared by demo visitors" className="inline-flex rounded-full bg-indigo-50 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wide text-indigo-700">Shared demo data</span>
+              <button
+                onClick={() => navigate('/')}
+                className="px-2.5 py-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-800 text-xs font-bold transition"
+              >
+                Exit demo
+              </button>
+            </div>
+          ) : isGuest ? (
             <button
               onClick={() => setAuthModalOpen(true)}
               aria-label="Sign in or register"
@@ -85,7 +96,7 @@ export function Navbar({ onOpenSidebar }) {
           ) : (
             <div className="flex items-center gap-2">
               <button
-                onClick={() => navigate('/settings')}
+                onClick={() => navigate(appPath('/settings', user?.is_demo))}
                 className="flex items-center gap-2 px-1.5 sm:px-2.5 py-1 rounded-lg hover:bg-slate-50 transition"
                 title="Account Settings"
               >

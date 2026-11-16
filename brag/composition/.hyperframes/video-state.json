@@ -1,0 +1,406 @@
+{
+  "version": 1,
+  "historyId": "ce31f1f8-076a-40b2-bd14-2fdb731d2dc0",
+  "currentRevision": "d06622c3-c093-43b0-9186-08e37324046a",
+  "pendingChanges": false,
+  "files": {
+    "DESIGN.md": {
+      "hash": "fb6c31997e629edf740936f5f848a2240a052fbb89f8be13c01c7ae49bb1864e",
+      "content": "C:\\Users\\IT-HOME\\.cache\\hyperframes\\history\\ce31f1f8-076a-40b2-bd14-2fdb731d2dc0\\blobs\\fb\\fb6c31997e629edf740936f5f848a2240a052fbb89f8be13c01c7ae49bb1864e"
+    },
+    "assets/brand/incomedesk-icon.svg": {
+      "hash": "414c677a2432ceb32f8c4acfb3f3394bb6664bce72e512fee9aaf088b51aded0",
+      "content": "C:\\Users\\IT-HOME\\.cache\\hyperframes\\history\\ce31f1f8-076a-40b2-bd14-2fdb731d2dc0\\blobs\\41\\414c677a2432ceb32f8c4acfb3f3394bb6664bce72e512fee9aaf088b51aded0"
+    },
+    "assets/music/audio-envelope.js": {
+      "hash": "5c3941138117a88c67db9922bb87d90cd038ac6824d1d7d320eb0f0825d08f38",
+      "content": "C:\\Users\\IT-HOME\\.cache\\hyperframes\\history\\ce31f1f8-076a-40b2-bd14-2fdb731d2dc0\\blobs\\5c\\5c3941138117a88c67db9922bb87d90cd038ac6824d1d7d320eb0f0825d08f38"
+    },
+    "assets/music/audio-envelope.json": {
+      "hash": "64ee9e3ea09ad1c4355e0d8aa208e54b9151476946a1d526c7df64a141bf215b",
+      "content": "C:\\Users\\IT-HOME\\.cache\\hyperframes\\history\\ce31f1f8-076a-40b2-bd14-2fdb731d2dc0\\blobs\\64\\64ee9e3ea09ad1c4355e0d8aa208e54b9151476946a1d526c7df64a141bf215b"
+    },
+    "assets/music/cues/happy-beats-business-moves-vol-12-by-ende-dot-app.music-cues.json": {
+      "hash": "76eea97e347e63e8037dc4fdbc08ab373bc83c10f797d1a8abd5509e73892aab",
+      "content": "C:\\Users\\IT-HOME\\.cache\\hyperframes\\history\\ce31f1f8-076a-40b2-bd14-2fdb731d2dc0\\blobs\\76\\76eea97e347e63e8037dc4fdbc08ab373bc83c10f797d1a8abd5509e73892aab"
+    },
+    "assets/music/cues/happy-beats-business-moves-vol-12-by-ende-dot-app.music-cues.md": {
+      "hash": "9441eb1c04d3278fe7e9d9820396345d206dc5aa97828610410ff28beab28936",
+      "content": "C:\\Users\\IT-HOME\\.cache\\hyperframes\\history\\ce31f1f8-076a-40b2-bd14-2fdb731d2dc0\\blobs\\94\\9441eb1c04d3278fe7e9d9820396345d206dc5aa97828610410ff28beab28936"
+    },
+    "assets/sfx/impact/impactSoft_medium_001.ogg": {
+      "hash": "7642a4fd43e547afe4f7adfadb3dabb681c0ff512f52c1674bae30a726841faf",
+      "content": "C:\\Users\\IT-HOME\\.cache\\hyperframes\\history\\ce31f1f8-076a-40b2-bd14-2fdb731d2dc0\\blobs\\76\\7642a4fd43e547afe4f7adfadb3dabb681c0ff512f52c1674bae30a726841faf"
+    },
+    "assets/sfx/interface/bong_001.ogg": {
+      "hash": "d21d0f0b782445db579d11e2506b24cd1ac9d664ee33aeaf807761aa7b6fd710",
+      "content": "C:\\Users\\IT-HOME\\.cache\\hyperframes\\history\\ce31f1f8-076a-40b2-bd14-2fdb731d2dc0\\blobs\\d2\\d21d0f0b782445db579d11e2506b24cd1ac9d664ee33aeaf807761aa7b6fd710"
+    },
+    "assets/sfx/interface/click_003.ogg": {
+      "hash": "2fa929138bc3a0f432696588f66eac94b8f6d463905ec8808c6461ce4b054292",
+      "content": "C:\\Users\\IT-HOME\\.cache\\hyperframes\\history\\ce31f1f8-076a-40b2-bd14-2fdb731d2dc0\\blobs\\2f\\2fa929138bc3a0f432696588f66eac94b8f6d463905ec8808c6461ce4b054292"
+    },
+    "assets/sfx/sfx-analysis.md": {
+      "hash": "135606f5434a64d4dd4a5351d35ba17da1f468117dfd5f08c1aa475c1015321a",
+      "content": "C:\\Users\\IT-HOME\\.cache\\hyperframes\\history\\ce31f1f8-076a-40b2-bd14-2fdb731d2dc0\\blobs\\13\\135606f5434a64d4dd4a5351d35ba17da1f468117dfd5f08c1aa475c1015321a"
+    },
+    "assets/vendor/gsap.min.js": {
+      "hash": "92bb9a96476f983d212a2bc4f54c889039c1696dd4461d40a736860938570fbb",
+      "content": "C:\\Users\\IT-HOME\\.cache\\hyperframes\\history\\ce31f1f8-076a-40b2-bd14-2fdb731d2dc0\\blobs\\92\\92bb9a96476f983d212a2bc4f54c889039c1696dd4461d40a736860938570fbb"
+    },
+    "debug.log": {
+      "hash": "c8894ae305dd96aba2756d8821a46d8d708c5a7fc69bc712668b244ca0f5d9f0",
+      "content": "C:\\Users\\IT-HOME\\.cache\\hyperframes\\history\\ce31f1f8-076a-40b2-bd14-2fdb731d2dc0\\blobs\\c8\\c8894ae305dd96aba2756d8821a46d8d708c5a7fc69bc712668b244ca0f5d9f0"
+    },
+    "index.html": {
+      "hash": "c4b3aecbc0384a89a7a749632cbc1a6f7f409d32b2694f5a8092f4a98a499a24",
+      "content": "C:\\Users\\IT-HOME\\.cache\\hyperframes\\history\\ce31f1f8-076a-40b2-bd14-2fdb731d2dc0\\blobs\\c4\\c4b3aecbc0384a89a7a749632cbc1a6f7f409d32b2694f5a8092f4a98a499a24"
+    },
+    "meta.json": {
+      "hash": "3e782f981e0505cdf7656f727e447d73319025cf772639a0aa32b2e8583f8b03",
+      "content": "C:\\Users\\IT-HOME\\.cache\\hyperframes\\history\\ce31f1f8-076a-40b2-bd14-2fdb731d2dc0\\blobs\\3e\\3e782f981e0505cdf7656f727e447d73319025cf772639a0aa32b2e8583f8b03"
+    },
+    "scripts/build-audio-envelope.mjs": {
+      "hash": "d49e7a50256826477ec45e2aa3a57faa2f164b515103538c33be1974598d3ebf",
+      "content": "C:\\Users\\IT-HOME\\.cache\\hyperframes\\history\\ce31f1f8-076a-40b2-bd14-2fdb731d2dc0\\blobs\\d4\\d49e7a50256826477ec45e2aa3a57faa2f164b515103538c33be1974598d3ebf"
+    },
+    "assets/music/happy-beats-business-moves-vol-12-by-ende-dot-app.mp3": {
+      "hash": "5888d4bd2ba0119b87a94e502ae2cc401c08192945cc5e5c2f8e8a33aa47a0a1",
+      "content": "C:\\Users\\IT-HOME\\.cache\\hyperframes\\history\\ce31f1f8-076a-40b2-bd14-2fdb731d2dc0\\blobs\\58\\5888d4bd2ba0119b87a94e502ae2cc401c08192945cc5e5c2f8e8a33aa47a0a1"
+    }
+  },
+  "revisions": {
+    "2870903e-2eb8-4f28-b531-05ba5bbca8d7": {
+      "actor": {
+        "kind": "outside",
+        "name": "Outside"
+      },
+      "label": "Changed outside the app",
+      "startedAt": 1794587112561,
+      "endedAt": 1794587112568,
+      "files": {
+        "index.html": {
+          "before": "C:\\Users\\IT-HOME\\.cache\\hyperframes\\history\\ce31f1f8-076a-40b2-bd14-2fdb731d2dc0\\blobs\\29\\295d161033594014347a3e4581b9cba9f41abeba47daf72f2abcb0635793175c",
+          "after": "C:\\Users\\IT-HOME\\.cache\\hyperframes\\history\\ce31f1f8-076a-40b2-bd14-2fdb731d2dc0\\blobs\\39\\397eb99ad77cec4546a20bf1e9c864cac0f760a1b01b0723174eb25e2da419ce"
+        }
+      }
+    },
+    "d06622c3-c093-43b0-9186-08e37324046a": {
+      "actor": {
+        "kind": "outside",
+        "name": "Outside"
+      },
+      "label": "Changed outside the app",
+      "startedAt": 1794587403820,
+      "endedAt": 1794587403831,
+      "files": {
+        "index.html": {
+          "before": "C:\\Users\\IT-HOME\\.cache\\hyperframes\\history\\ce31f1f8-076a-40b2-bd14-2fdb731d2dc0\\blobs\\39\\397eb99ad77cec4546a20bf1e9c864cac0f760a1b01b0723174eb25e2da419ce",
+          "after": "C:\\Users\\IT-HOME\\.cache\\hyperframes\\history\\ce31f1f8-076a-40b2-bd14-2fdb731d2dc0\\blobs\\c4\\c4b3aecbc0384a89a7a749632cbc1a6f7f409d32b2694f5a8092f4a98a499a24"
+        }
+      }
+    }
+  },
+  "checks": {
+    "latest": {
+      "revision": "d06622c3-c093-43b0-9186-08e37324046a",
+      "id": "5e80fa8e-27a5-49d3-ac2d-16a314eacbc9"
+    },
+    "revisions": {
+      "2870903e-2eb8-4f28-b531-05ba5bbca8d7": [
+        {
+          "id": "d0f74dc9-39df-46e8-8c57-232505a6c286",
+          "scope": "project",
+          "metadata": {
+            "ok": true,
+            "browserSkipped": false,
+            "options": {
+              "samples": 9,
+              "atTransitions": false,
+              "maxIssues": 80,
+              "collapseStatic": true,
+              "tolerance": 2,
+              "timeout": 3000,
+              "contrast": true,
+              "strict": false,
+              "snapshots": false,
+              "browserGpuMode": "auto"
+            }
+          },
+          "createdAt": 1794587129465,
+          "contentHash": "2d8682fbf02c769722c7199c010db79524e733550b6ddace723a80d14dfc9fd4",
+          "revision": "2870903e-2eb8-4f28-b531-05ba5bbca8d7",
+          "inputFingerprint": "5b6a8c006cc6776624111b5efb8be60cf493ae2f9b5615f23ab4b5333c2c71ac",
+          "inputScope": "local-project-files",
+          "attribution": "recorded-revision",
+          "status": "cleaned",
+          "cleanedAfterRender": "a3fbc6be-0ac7-4647-977b-423a3ae93a4f"
+        },
+        {
+          "id": "e64c8257-c503-45dc-bf07-7747f88f3ece",
+          "scope": "project",
+          "metadata": {
+            "ok": true,
+            "browserSkipped": false,
+            "options": {
+              "samples": 9,
+              "at": [
+                2,
+                8.9,
+                12.8,
+                18.8
+              ],
+              "atTransitions": false,
+              "maxIssues": 80,
+              "collapseStatic": true,
+              "tolerance": 2,
+              "timeout": 3000,
+              "contrast": true,
+              "strict": false,
+              "snapshots": true,
+              "browserGpuMode": "auto"
+            }
+          },
+          "createdAt": 1794587208162,
+          "contentHash": "cd462c150076e29129bda5180eab5934fcef6b8472563b2f6946f5a39b618293",
+          "revision": "2870903e-2eb8-4f28-b531-05ba5bbca8d7",
+          "inputFingerprint": "5b6a8c006cc6776624111b5efb8be60cf493ae2f9b5615f23ab4b5333c2c71ac",
+          "inputScope": "local-project-files",
+          "attribution": "recorded-revision",
+          "status": "cleaned",
+          "cleanedAfterRender": "a3fbc6be-0ac7-4647-977b-423a3ae93a4f"
+        }
+      ],
+      "d06622c3-c093-43b0-9186-08e37324046a": [
+        {
+          "id": "5e80fa8e-27a5-49d3-ac2d-16a314eacbc9",
+          "scope": "project",
+          "report": "C:\\Users\\IT-HOME\\Downloads\\Projects\\Program Files\\IncomeDesk\\brag\\composition\\.hyperframes\\artifacts\\checks\\5e80fa8e-27a5-49d3-ac2d-16a314eacbc9.json",
+          "metadata": {
+            "ok": true,
+            "browserSkipped": false,
+            "options": {
+              "samples": 9,
+              "at": [
+                2,
+                8.9,
+                12.8,
+                18.8
+              ],
+              "atTransitions": false,
+              "maxIssues": 80,
+              "collapseStatic": true,
+              "tolerance": 2,
+              "timeout": 3000,
+              "contrast": true,
+              "strict": false,
+              "snapshots": true,
+              "browserGpuMode": "auto"
+            }
+          },
+          "createdAt": 1794587421569,
+          "contentHash": "e184b056044cb73191c38f665338d736218fcce49746f1fbfb060ef60feb47c3",
+          "revision": "d06622c3-c093-43b0-9186-08e37324046a",
+          "inputFingerprint": "5bd52dc863ebab0021d6cf198a9edb7ab55f425923ba8c1e964277030b6db99a",
+          "inputScope": "local-project-files",
+          "attribution": "recorded-revision"
+        }
+      ]
+    },
+    "unversioned": [
+      {
+        "id": "6e7c3fe2-ee39-466d-82cf-5c14e0d38eca",
+        "scope": "project",
+        "report": "C:\\Users\\IT-HOME\\Downloads\\Projects\\Program Files\\IncomeDesk\\brag\\composition\\.hyperframes\\artifacts\\checks\\6e7c3fe2-ee39-466d-82cf-5c14e0d38eca.json",
+        "metadata": {
+          "ok": false,
+          "browserSkipped": false,
+          "options": {
+            "samples": 9,
+            "atTransitions": false,
+            "maxIssues": 80,
+            "collapseStatic": true,
+            "tolerance": 2,
+            "timeout": 3000,
+            "contrast": true,
+            "strict": false,
+            "snapshots": false,
+            "browserGpuMode": "auto"
+          }
+        },
+        "createdAt": 1794586826761,
+        "contentHash": "ff9788378f50bbafad12eed092f3d7a90f7b96162e1c29262cd7b550b30cc6b9",
+        "revision": null,
+        "inputFingerprint": "d853d6cc6ce852e2bd180231e5f579b9b7a169fa1d05c72a0ae0889ebb192c7c",
+        "inputScope": "local-project-files",
+        "attribution": "unversioned"
+      }
+    ]
+  },
+  "snapshots": {
+    "latest": {
+      "revision": "d06622c3-c093-43b0-9186-08e37324046a",
+      "id": "5e80fa8e-27a5-49d3-ac2d-16a314eacbc9-3"
+    },
+    "revisions": {
+      "2870903e-2eb8-4f28-b531-05ba5bbca8d7": [
+        {
+          "id": "e64c8257-c503-45dc-bf07-7747f88f3ece-0",
+          "scope": "full",
+          "time": 2,
+          "metadata": {
+            "checkId": "e64c8257-c503-45dc-bf07-7747f88f3ece",
+            "width": 1080,
+            "height": 1920
+          },
+          "createdAt": 1794587208163,
+          "contentHash": "18ba446989bf7013dfdcb3941c58b14f50cc8ad03cd60c7d72d01f035f0a2d4b",
+          "revision": "2870903e-2eb8-4f28-b531-05ba5bbca8d7",
+          "inputFingerprint": "5b6a8c006cc6776624111b5efb8be60cf493ae2f9b5615f23ab4b5333c2c71ac",
+          "inputScope": "local-project-files",
+          "attribution": "recorded-revision",
+          "status": "cleaned",
+          "cleanedAfterRender": "a3fbc6be-0ac7-4647-977b-423a3ae93a4f"
+        },
+        {
+          "id": "e64c8257-c503-45dc-bf07-7747f88f3ece-1",
+          "scope": "full",
+          "time": 8.9,
+          "metadata": {
+            "checkId": "e64c8257-c503-45dc-bf07-7747f88f3ece",
+            "width": 1080,
+            "height": 1920
+          },
+          "createdAt": 1794587208163,
+          "contentHash": "5f511842397dbe91874fd877dfdba90efadec9a932c3ca27e3558cd1d6a5cca6",
+          "revision": "2870903e-2eb8-4f28-b531-05ba5bbca8d7",
+          "inputFingerprint": "5b6a8c006cc6776624111b5efb8be60cf493ae2f9b5615f23ab4b5333c2c71ac",
+          "inputScope": "local-project-files",
+          "attribution": "recorded-revision",
+          "status": "cleaned",
+          "cleanedAfterRender": "a3fbc6be-0ac7-4647-977b-423a3ae93a4f"
+        },
+        {
+          "id": "e64c8257-c503-45dc-bf07-7747f88f3ece-2",
+          "scope": "full",
+          "time": 12.8,
+          "metadata": {
+            "checkId": "e64c8257-c503-45dc-bf07-7747f88f3ece",
+            "width": 1080,
+            "height": 1920
+          },
+          "createdAt": 1794587208163,
+          "contentHash": "0ac9dda378c897860cbd610e7619c0b0b01e8dfdc59fd10b4986634f19af171d",
+          "revision": "2870903e-2eb8-4f28-b531-05ba5bbca8d7",
+          "inputFingerprint": "5b6a8c006cc6776624111b5efb8be60cf493ae2f9b5615f23ab4b5333c2c71ac",
+          "inputScope": "local-project-files",
+          "attribution": "recorded-revision",
+          "status": "cleaned",
+          "cleanedAfterRender": "a3fbc6be-0ac7-4647-977b-423a3ae93a4f"
+        },
+        {
+          "id": "e64c8257-c503-45dc-bf07-7747f88f3ece-3",
+          "scope": "full",
+          "time": 18.8,
+          "metadata": {
+            "checkId": "e64c8257-c503-45dc-bf07-7747f88f3ece",
+            "width": 1080,
+            "height": 1920
+          },
+          "createdAt": 1794587208163,
+          "contentHash": "f406ae0ad6e7eb30a0376f00557eaf5fbc6ad34aa350dd832ebacc3ba00829c2",
+          "revision": "2870903e-2eb8-4f28-b531-05ba5bbca8d7",
+          "inputFingerprint": "5b6a8c006cc6776624111b5efb8be60cf493ae2f9b5615f23ab4b5333c2c71ac",
+          "inputScope": "local-project-files",
+          "attribution": "recorded-revision",
+          "status": "cleaned",
+          "cleanedAfterRender": "a3fbc6be-0ac7-4647-977b-423a3ae93a4f"
+        }
+      ],
+      "d06622c3-c093-43b0-9186-08e37324046a": [
+        {
+          "id": "5e80fa8e-27a5-49d3-ac2d-16a314eacbc9-0",
+          "scope": "full",
+          "image": "C:\\Users\\IT-HOME\\Downloads\\Projects\\Program Files\\IncomeDesk\\brag\\composition\\.hyperframes\\artifacts\\snapshots\\7dfc0262-5816-4fc5-a8d7-3400901199ed\\frame-00-at-2.0s.png",
+          "time": 2,
+          "metadata": {
+            "checkId": "5e80fa8e-27a5-49d3-ac2d-16a314eacbc9",
+            "width": 1080,
+            "height": 1920
+          },
+          "createdAt": 1794587421570,
+          "contentHash": "18ba446989bf7013dfdcb3941c58b14f50cc8ad03cd60c7d72d01f035f0a2d4b",
+          "revision": "d06622c3-c093-43b0-9186-08e37324046a",
+          "inputFingerprint": "5bd52dc863ebab0021d6cf198a9edb7ab55f425923ba8c1e964277030b6db99a",
+          "inputScope": "local-project-files",
+          "attribution": "recorded-revision"
+        },
+        {
+          "id": "5e80fa8e-27a5-49d3-ac2d-16a314eacbc9-1",
+          "scope": "full",
+          "image": "C:\\Users\\IT-HOME\\Downloads\\Projects\\Program Files\\IncomeDesk\\brag\\composition\\.hyperframes\\artifacts\\snapshots\\7dfc0262-5816-4fc5-a8d7-3400901199ed\\frame-01-at-8.9s.png",
+          "time": 8.9,
+          "metadata": {
+            "checkId": "5e80fa8e-27a5-49d3-ac2d-16a314eacbc9",
+            "width": 1080,
+            "height": 1920
+          },
+          "createdAt": 1794587421571,
+          "contentHash": "89ada74a5eeb87003275627e76ac3c73e444f32aff39ae733581854a0c30e6ff",
+          "revision": "d06622c3-c093-43b0-9186-08e37324046a",
+          "inputFingerprint": "5bd52dc863ebab0021d6cf198a9edb7ab55f425923ba8c1e964277030b6db99a",
+          "inputScope": "local-project-files",
+          "attribution": "recorded-revision"
+        },
+        {
+          "id": "5e80fa8e-27a5-49d3-ac2d-16a314eacbc9-2",
+          "scope": "full",
+          "image": "C:\\Users\\IT-HOME\\Downloads\\Projects\\Program Files\\IncomeDesk\\brag\\composition\\.hyperframes\\artifacts\\snapshots\\7dfc0262-5816-4fc5-a8d7-3400901199ed\\frame-02-at-12.8s.png",
+          "time": 12.8,
+          "metadata": {
+            "checkId": "5e80fa8e-27a5-49d3-ac2d-16a314eacbc9",
+            "width": 1080,
+            "height": 1920
+          },
+          "createdAt": 1794587421571,
+          "contentHash": "0ac9dda378c897860cbd610e7619c0b0b01e8dfdc59fd10b4986634f19af171d",
+          "revision": "d06622c3-c093-43b0-9186-08e37324046a",
+          "inputFingerprint": "5bd52dc863ebab0021d6cf198a9edb7ab55f425923ba8c1e964277030b6db99a",
+          "inputScope": "local-project-files",
+          "attribution": "recorded-revision"
+        },
+        {
+          "id": "5e80fa8e-27a5-49d3-ac2d-16a314eacbc9-3",
+          "scope": "full",
+          "image": "C:\\Users\\IT-HOME\\Downloads\\Projects\\Program Files\\IncomeDesk\\brag\\composition\\.hyperframes\\artifacts\\snapshots\\7dfc0262-5816-4fc5-a8d7-3400901199ed\\frame-03-at-18.8s.png",
+          "time": 18.8,
+          "metadata": {
+            "checkId": "5e80fa8e-27a5-49d3-ac2d-16a314eacbc9",
+            "width": 1080,
+            "height": 1920
+          },
+          "createdAt": 1794587421572,
+          "contentHash": "f406ae0ad6e7eb30a0376f00557eaf5fbc6ad34aa350dd832ebacc3ba00829c2",
+          "revision": "d06622c3-c093-43b0-9186-08e37324046a",
+          "inputFingerprint": "5bd52dc863ebab0021d6cf198a9edb7ab55f425923ba8c1e964277030b6db99a",
+          "inputScope": "local-project-files",
+          "attribution": "recorded-revision"
+        }
+      ]
+    },
+    "unversioned": []
+  },
+  "renders": {
+    "latest": {
+      "id": "a3fbc6be-0ac7-4647-977b-423a3ae93a4f",
+      "completedAt": 1794587585785,
+      "output": "C:\\Users\\IT-HOME\\Downloads\\Projects\\Program Files\\IncomeDesk\\brag\\brag.mp4",
+      "status": "completed",
+      "revision": "d06622c3-c093-43b0-9186-08e37324046a"
+    },
+    "retainedRevisions": [
+      "d06622c3-c093-43b0-9186-08e37324046a"
+    ]
+  },
+  "pendingArtifactCleanup": []
+}

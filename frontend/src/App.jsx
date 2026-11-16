@@ -1,5 +1,5 @@
 import React from 'react';
-import { Routes, Route, Navigate } from 'react-router-dom';
+import { Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { MainLayout } from './layouts/MainLayout';
 import { Dashboard } from './pages/Dashboard';
 import { Transactions } from './pages/Transactions';
@@ -25,9 +25,12 @@ import { PricingPage } from './pages/PricingPage';
 import { ForgotPasswordPage, ResetPasswordPage } from './pages/PasswordRecoveryPage';
 import { LoadingSpinner } from './components/LoadingSpinner';
 import { useAuth } from './contexts/AuthContext';
+import { isDemoPath } from './utils/appPath';
 
 export default function App() {
   const { user, loading } = useAuth();
+  const location = useLocation();
+  const demoRoute = isDemoPath(location.pathname);
 
   if (loading) {
     return (
@@ -47,8 +50,30 @@ export default function App() {
       <Route path="/forgot-password" element={<ForgotPasswordPage />} />
       <Route path="/reset-password" element={<ResetPasswordPage />} />
 
-      {/* Authenticated Application Routes */}
-      {user ? (
+      {demoRoute ? (
+        <Route path="/demo" element={<MainLayout />}>
+          <Route index element={<Dashboard />} />
+          <Route path="transactions" element={<Transactions />} />
+          <Route path="income" element={<Income />} />
+          <Route path="expenses" element={<Expenses />} />
+          <Route path="accounts" element={<Accounts />} />
+          <Route path="budgets" element={<Budgets />} />
+          <Route path="clients" element={<Clients />} />
+          <Route path="projects" element={<Projects />} />
+          <Route path="invoices" element={<Invoices />} />
+          <Route path="subscriptions" element={<Subscriptions />} />
+          <Route path="taxes" element={<Taxes />} />
+          <Route path="savings" element={<Savings />} />
+          <Route path="loans" element={<Loans />} />
+          <Route path="reports" element={<Reports />} />
+          <Route path="pricing" element={<PricingPage />} />
+          <Route path="settings" element={<Settings />} />
+          <Route path="privacy" element={<PrivacyPolicy />} />
+          <Route path="terms" element={<TermsOfService />} />
+          <Route path="security" element={<SecurityPolicy />} />
+          <Route path="*" element={<Navigate to="/demo" replace />} />
+        </Route>
+      ) : user ? (
         <Route path="/" element={<MainLayout />}>
           <Route index element={<Dashboard />} />
           <Route path="transactions" element={<Transactions />} />

@@ -1,0 +1,215 @@
+{
+  "ok": true,
+  "strict": false,
+  "browserSkipped": false,
+  "lint": {
+    "ok": true,
+    "errorCount": 0,
+    "warningCount": 4,
+    "infoCount": 0,
+    "findings": [
+      {
+        "code": "nested_structure_needs_subcomposition",
+        "severity": "warning",
+        "message": "<section id=\"scene-1\"> is a timeline element that contains nested <div id=\"s1-glow\">. The timeline shows one row per top-level element, and the root composition is built only from sub-compositions.",
+        "selector": "#scene-1",
+        "dataAttributes": {},
+        "sourceFile": "C:\\Users\\IT-HOME\\Downloads\\Projects\\Program Files\\IncomeDesk\\brag\\brag-output-2026-11-13-214023\\composition\\index.html",
+        "bbox": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        },
+        "time": 0,
+        "fixHint": "Move <section id=\"scene-1\"> and its contents into a sub-composition file and mount it with data-composition-src."
+      },
+      {
+        "code": "nested_structure_needs_subcomposition",
+        "severity": "warning",
+        "message": "<section id=\"scene-2\"> is a timeline element that contains nested <div id=\"s2-glow\">. The timeline shows one row per top-level element, and the root composition is built only from sub-compositions.",
+        "selector": "#scene-2",
+        "dataAttributes": {},
+        "sourceFile": "C:\\Users\\IT-HOME\\Downloads\\Projects\\Program Files\\IncomeDesk\\brag\\brag-output-2026-11-13-214023\\composition\\index.html",
+        "bbox": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        },
+        "time": 0,
+        "fixHint": "Move <section id=\"scene-2\"> and its contents into a sub-composition file and mount it with data-composition-src."
+      },
+      {
+        "code": "nested_structure_needs_subcomposition",
+        "severity": "warning",
+        "message": "<section id=\"scene-3\"> is a timeline element that contains nested <div id=\"s3-glow\">. The timeline shows one row per top-level element, and the root composition is built only from sub-compositions.",
+        "selector": "#scene-3",
+        "dataAttributes": {},
+        "sourceFile": "C:\\Users\\IT-HOME\\Downloads\\Projects\\Program Files\\IncomeDesk\\brag\\brag-output-2026-11-13-214023\\composition\\index.html",
+        "bbox": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        },
+        "time": 0,
+        "fixHint": "Move <section id=\"scene-3\"> and its contents into a sub-composition file and mount it with data-composition-src."
+      },
+      {
+        "code": "nested_structure_needs_subcomposition",
+        "severity": "warning",
+        "message": "<section id=\"scene-4\"> is a timeline element that contains nested <div id=\"s4-glow\">. The timeline shows one row per top-level element, and the root composition is built only from sub-compositions.",
+        "selector": "#scene-4",
+        "dataAttributes": {},
+        "sourceFile": "C:\\Users\\IT-HOME\\Downloads\\Projects\\Program Files\\IncomeDesk\\brag\\brag-output-2026-11-13-214023\\composition\\index.html",
+        "bbox": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        },
+        "time": 0,
+        "fixHint": "Move <section id=\"scene-4\"> and its contents into a sub-composition file and mount it with data-composition-src."
+      }
+    ],
+    "filesScanned": 1
+  },
+  "runtime": {
+    "ok": true,
+    "errorCount": 0,
+    "warningCount": 0,
+    "infoCount": 0,
+    "findings": []
+  },
+  "layout": {
+    "ok": true,
+    "errorCount": 0,
+    "warningCount": 0,
+    "infoCount": 0,
+    "findings": [],
+    "duration": 21,
+    "samples": [
+      3.2,
+      7.8,
+      11.8,
+      18.6
+    ],
+    "transitionSamples": [],
+    "transitionSamplesDropped": 0,
+    "tolerance": 2,
+    "totalIssueCount": 0,
+    "truncated": false
+  },
+  "motion": {
+    "ok": true,
+    "errorCount": 0,
+    "warningCount": 0,
+    "infoCount": 0,
+    "findings": [],
+    "enabled": false,
+    "samples": 0
+  },
+  "contrast": {
+    "ok": true,
+    "errorCount": 0,
+    "warningCount": 0,
+    "infoCount": 0,
+    "findings": [],
+    "enabled": true,
+    "samples": [
+      3.2,
+      7.8,
+      11.8,
+      18.6
+    ],
+    "checked": 73,
+    "passed": 73
+  },
+  "craft": {
+    "ok": true,
+    "errorCount": 0,
+    "warningCount": 1,
+    "infoCount": 0,
+    "findings": [
+      {
+        "code": "text_below_floor",
+        "severity": "warning",
+        "message": "Type floor is 28 px (2.6% of the 1080 px short side, what a phone can read) and 4 text elements stay under it for 0.5 s or more, the smallest \"FEB 02 · CLIENT\" at 22 px: set reading text to at least 28 px, or put data-layout-ignore on text that is texture rather than reading; see references/look.md.",
+        "text": "FEB 02 · CLIENT",
+        "selector": "#s1-row-1 > div:nth-of-type(1) > span:nth-of-type(1)",
+        "dataAttributes": {},
+        "sourceFile": "index.html",
+        "bbox": {
+          "x": 105.44,
+          "y": 1068.38,
+          "width": 200.47,
+          "height": 26
+        },
+        "time": 1.375,
+        "times": [
+          1.375,
+          1.75,
+          2,
+          2.375
+        ],
+        "fontPx": 22,
+        "floorPx": 28,
+        "seconds": 3.625,
+        "elements": [
+          {
+            "selector": "#s1-row-1 > div:nth-of-type(1) > span:nth-of-type(1)",
+            "text": "FEB 02 · CLIENT",
+            "fontPx": 22,
+            "time": 1.375,
+            "seconds": 3.625
+          },
+          {
+            "selector": "#s1-row-2 > div:nth-of-type(1) > span:nth-of-type(1)",
+            "text": "FEB 03 · STUDIO",
+            "fontPx": 22,
+            "time": 1.75,
+            "seconds": 3.25
+          },
+          {
+            "selector": "#s1-row-3 > div:nth-of-type(1) > span:nth-of-type(1)",
+            "text": "FEB 05 · BUSINESS",
+            "fontPx": 22,
+            "time": 2,
+            "seconds": 3
+          },
+          {
+            "selector": "#s1-row-4 > div:nth-of-type(1) > span:nth-of-type(1)",
+            "text": "FEB 08 · PROJECT",
+            "fontPx": 22,
+            "time": 2.375,
+            "seconds": 2.625
+          }
+        ]
+      }
+    ],
+    "enabled": true,
+    "step": 0.125,
+    "samples": 168
+  },
+  "hdr": {
+    "autoPromotion": null,
+    "inspection": "available"
+  },
+  "snapshots": {
+    "enabled": true,
+    "files": [
+      ".hyperframes\\artifacts\\snapshots\\89432931-85bf-4520-aa94-050069a941fd\\frame-00-at-3.2s.png",
+      ".hyperframes\\artifacts\\snapshots\\89432931-85bf-4520-aa94-050069a941fd\\frame-01-at-7.8s.png",
+      ".hyperframes\\artifacts\\snapshots\\89432931-85bf-4520-aa94-050069a941fd\\frame-02-at-11.8s.png",
+      ".hyperframes\\artifacts\\snapshots\\89432931-85bf-4520-aa94-050069a941fd\\frame-03-at-18.6s.png"
+    ],
+    "times": [
+      3.2,
+      7.8,
+      11.8,
+      18.6
+    ],
+    "findingFiles": []
+  }
+}

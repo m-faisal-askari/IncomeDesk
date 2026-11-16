@@ -10,6 +10,7 @@ import { EmptyState } from '../components/EmptyState';
 import { formatCurrency, formatDate } from '../utils/formatters';
 import { useToast } from '../contexts/ToastContext';
 import { useCurrency } from '../contexts/CurrencyContext';
+import { appPath } from '../utils/appPath';
 
 export function Projects() {
   const queryClient = useQueryClient();
@@ -517,7 +518,7 @@ export function Projects() {
                   type="button"
                   onClick={() => {
                     setIsFinancialsModalOpen(false);
-                    navigate('/invoices?new=1');
+                    navigate(appPath('/invoices?new=1'));
                   }}
                   className="inline-flex items-center gap-1 px-2.5 py-1 rounded-md bg-slate-100 text-slate-700 hover:bg-slate-200 font-semibold text-[11px] transition"
                 >

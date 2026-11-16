@@ -1,11 +1,23 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useState, useEffect, useLayoutEffect } from 'react';
+import { useLocation } from 'react-router-dom';
 import { api } from '../api/client';
 import { supabase } from '../api/supabase';
 import { getFrontendUrl } from '../config/urls';
 import { useQueryClient } from '@tanstack/react-query';
 import { clearAuthError, reportAuthError } from '../utils/authErrorEvents';
+import { isDemoPath } from '../utils/appPath';
 
 const AuthContext = createContext(null);
+const DEMO_USER = {
+  user_id: 'incomedesk-public-demo',
+  is_authenticated: true,
+  is_guest: false,
+  is_demo: true,
+  email: 'alex.morgan@example.com',
+  full_name: 'Alex Morgan',
+  base_currency: 'USD',
+  user_type: 'demo',
+};
 
 function getSessionUserFallback(sessionUser) {
   const metadata = sessionUser?.user_metadata || {};
@@ -27,8 +39,14 @@ function getSessionUserFallback(sessionUser) {
 
 export function AuthProvider({ children }) {
   const queryClient = useQueryClient();
+  const location = useLocation();
+  const isDemoMode = isDemoPath(location.pathname);
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
+
+  useLayoutEffect(() => {
+    queryClient.clear();
+  }, [isDemoMode, queryClient]);
 
   const fetchCurrentUser = async () => {
     const { data: sessionData, error: sessionError } = await supabase.auth.getSession();
@@ -107,6 +125,7 @@ export function AuthProvider({ children }) {
     let isActive = true;
 
     const initAuth = async () => {
+      setLoading(true);
       try {
         const { data, error } = await supabase.auth.getSession();
         if (error) throw error;
@@ -138,6 +157,7 @@ export function AuthProvider({ children }) {
 
     // Listen before reading the session so an OAuth callback event cannot be missed.
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      if (isDemoMode) return;
       if (event === 'SIGNED_IN' || event === 'PASSWORD_RECOVERY') {
         clearAuthError();
         if (session?.user) {
@@ -150,13 +170,18 @@ export function AuthProvider({ children }) {
       }
     });
 
-    void initAuth();
+    if (isDemoMode) {
+      setUser(DEMO_USER);
+      setLoading(false);
+    } else {
+      void initAuth();
+    }
 
     return () => {
       isActive = false;
       subscription?.unsubscribe();
     };
-  }, []);
+  }, [isDemoMode]);
 
   const login = async (email, password) => {
     const { data, error } = await supabase.auth.signInWithPassword({
@@ -249,10 +274,13 @@ export function AuthProvider({ children }) {
     }
   };
 
+  const activeUser = isDemoMode ? DEMO_USER : user?.is_demo ? null : user;
+  const activeLoading = isDemoMode ? false : user?.is_demo ? true : loading;
+
   return (
     <AuthContext.Provider value={{
-      user,
-      loading,
+      user: activeUser,
+      loading: activeLoading,
       login,
       register,
       loginWithGoogle,

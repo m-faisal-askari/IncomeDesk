@@ -2,6 +2,7 @@ import React from 'react';
 import { NavLink } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { BrandIcon } from './BrandAssets';
+import { appPath } from '../utils/appPath';
 import {
   LayoutDashboard,
   ArrowLeftRight,
@@ -114,7 +115,7 @@ export function Sidebar({ isOpen, onClose }) {
                   return (
                     <NavLink
                       key={item.path}
-                      to={item.path}
+                      to={appPath(item.path, user?.is_demo)}
                       onClick={onClose}
                       className={({ isActive }) => `sidebar-link flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${isActive ? 'is-active' : ''}`}
                     >
@@ -140,7 +141,8 @@ export function Sidebar({ isOpen, onClose }) {
             </div>
             <div className="overflow-hidden">
               <p className="sidebar-user-name text-xs font-medium truncate">{displayName}</p>
-              <p className="text-[10px] text-[var(--analytics-text)] font-mono">
+              {user?.is_demo && <p className="text-[10px] text-[var(--analytics-text)] font-mono">Sample workspace</p>}
+              <p className={`text-[10px] text-[var(--analytics-text)] font-mono ${user?.is_demo ? 'hidden' : ''}`}>
                 {user?.is_guest ? '○ Guest Mode' : '● Production Engine'}
               </p>
             </div>
